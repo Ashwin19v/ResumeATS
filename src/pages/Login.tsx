@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { FaGoogle } from "react-icons/fa";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
-  const handleLogin = (e) => {
+  const handleLogin = (e: FormEvent) => {
     e.preventDefault();
     console.log("Login with:", email, password);
   };
@@ -16,7 +16,7 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
-      <div className="w-full max-w-md bg-gray-800  p-8 rounded-2xl shadow-lg">
+      <div className="w-full max-w-md bg-gray-800 p-8 rounded-2xl shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -53,23 +53,25 @@ const Login = () => {
         </form>
 
         <div className="text-center mt-2">
-          Register for new User
-          <a href="/signup" className="text-blue-500 ">
-            {" "}
+          Register for new User{" "}
+          <a href="/signup" className="text-blue-500 hover:underline">
             Sign Up
           </a>
         </div>
 
-        <div className=" flex flex-col items-center justify-center">
-          <div className="mb-4">
-            ---------------------------- or --------------------------
+        <div className="flex flex-col items-center justify-center mt-4">
+          <div className="mb-4 w-full text-center">
+            <span className="block w-full border-t border-gray-600 my-2"></span>
+            <span className="text-sm text-gray-400">Or login with</span>
+            <span className="block w-full border-t border-gray-600 my-2"></span>
           </div>
-          <div>Login with Google</div>
+
           <button
             onClick={handleGoogleLogin}
-            className="rounded-full h-10 w-10"
+            className="rounded-full h-12 w-12 flex items-center justify-center bg-white hover:bg-gray-200 transition"
+            aria-label="Login with Google"
           >
-            <FaGoogle className="text-lg text-blue-500 bg-white rounded-full h-10 w-10 p-2 my-2 hover:text-blue-300 " />
+            <FaGoogle className="text-blue-500 text-2xl" />
           </button>
         </div>
       </div>
