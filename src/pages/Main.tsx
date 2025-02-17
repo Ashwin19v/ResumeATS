@@ -32,6 +32,12 @@ const Main = () => {
 
         <PdfUpload setPdfFile={setPdfFile} />
 
+        <button
+          className="bg-blue-300 text-slate-800 mx-auto inline-block p-2 rounded-lg"
+          onClick={handleToggleScore}
+        >View ATS Score
+        </button>
+
         <div className="flex flex-col gap-8">
           <textarea
             className="text-gray-400 bg-gray-800 p-4 rounded-lg w-full outline-none h-[200px] resize-none"

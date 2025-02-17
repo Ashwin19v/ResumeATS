@@ -1,8 +1,7 @@
-import React from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
-
+import "react-circular-progressbar/dist/styles.css";
 interface AtScoreModalProps {
     toggleScore: boolean;
     handleToggleScore: () => void;
@@ -26,19 +25,24 @@ const AtScoreModal = ({ toggleScore, handleToggleScore }: AtScoreModalProps) => 
                         className="p-2 rounded-full hover:bg-gray-600 transition-all duration-500 ease-in-out cursor-pointer"
                     />
 
+
+
                     <div className="w-48 h-48 mx-auto my-4">
                         <CircularProgressbar
                             value={90}
-                            text={`${90}%`}
+                            text={`90%`}
                             styles={buildStyles({
                                 pathColor: "#3b82f6",
                                 textColor: "#ffffff",
                                 trailColor: "#374151",
                                 textSize: "16px",
-                                pathTransitionDuration: 1,
                             })}
                         />
                     </div>
+
+
+                    export default ProgressBar;
+
 
                     <div>ATS: Lorem ipsum, dolor sit amet consectetur adipisicing elit.</div>
                     <div>ATS</div>
