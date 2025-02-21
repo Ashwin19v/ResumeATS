@@ -46,6 +46,7 @@ const Main = () => {
           <div className="flex justify-between items-center">
             <FontAwesomeIcon
               icon={faMessage}
+              bounce={true}
               onClick={handleToggle}
               className="bg-blue-600 hover:bg-blue-700 transition-colors p-3 rounded-full h-5 cursor-pointer"
             />

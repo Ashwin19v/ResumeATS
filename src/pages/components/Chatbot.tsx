@@ -11,23 +11,35 @@ const Chatbot = ({ toggle, handleToggle }: { toggle: boolean, handleToggle: () =
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
 
-    const sendMessage = () => {
-        if (input.trim() !== "") {
-            setMessages([...messages, { text: input, sender: "user" }]);
-            setInput("");
 
-            setTimeout(() => {
-                setMessages((prev) => [
-                    ...prev,
-                    { text: "Hello! How can I help?", sender: "bot" },
-                ]);
-            }, 1000);
+
+
+
+    const handleSendMessage = (e: any) => {
+        if (e.key === "Enter" || e.type === "click") {
+            if (input.trim() !== "") {
+                setMessages([...messages, { text: input, sender: "user" }]);
+                setInput("");
+
+                setTimeout(() => {
+                    setMessages((prev) => [
+                        ...prev,
+                        { text: "Hello! How can I help?", sender: "bot" },
+                    ]);
+                }, 1000);
+            }
+            else {
+                alert("Please enter a message")
+            }
         }
+
     };
 
     return (
         <div
-            className={`fixed left-0 top-0 h-full w-[60%] flex flex-col justify-between p-5 bg-gray-800 transition-all duration-500 ease-in-out ${toggle ? "translate-x-0" : "-translate-x-full"
+            className={`fixed left-0 top-0 h-full w-[60%] 
+                flex flex-col justify-between p-5 bg-gray-800 transition-all duration-500 ease-in-out 
+                ${toggle ? "translate-x-0" : "-translate-x-full"
                 }`}
             style={{ zIndex: 50 }}
         >
@@ -57,11 +69,12 @@ const Chatbot = ({ toggle, handleToggle }: { toggle: boolean, handleToggle: () =
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => handleSendMessage(e)}
                     placeholder="Type a message..."
                     className="flex-1 p-2 bg-gray-600 rounded-lg text-white outline-none"
                 />
                 <button
-                    onClick={sendMessage}
+                    onClick={(e) => handleSendMessage(e)}
                     className="ml-2 px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                     Send
