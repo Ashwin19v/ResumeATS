@@ -10,11 +10,10 @@ const Main = () => {
   const [pdfFile, setPdfFile] = useState<string | null>(null);
   const [toggle, setToggle] = useState(false);
   const [toggleScore, setToggleScore] = useState(false);
+  const [extractedText, setExtractedText] = useState<string>("");
 
   const handleToggle = () => setToggle(!toggle);
   const handleToggleScore = () => setToggleScore(!toggleScore);
-
-
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
@@ -26,11 +25,15 @@ const Main = () => {
             <FontAwesomeIcon icon={faUser} />
             <a href="/">Log out</a>
           </div>
-          <h2 className="text-lg font-bold text-center">Upload & Preview PDF</h2>
+          <h2 className="text-lg font-bold text-center">
+            Upload & Preview PDF
+          </h2>
         </div>
 
-
-        <PdfUpload setPdfFile={setPdfFile} />
+        <PdfUpload
+          setPdfFile={setPdfFile}
+          setExtractedText={setExtractedText}
+        />
 
         <div className="flex flex-col gap-8">
           <textarea
@@ -52,7 +55,10 @@ const Main = () => {
 
       <PdfPreview pdfFile={pdfFile} />
 
-      <AtScoreModal toggleScore={toggleScore} handleToggleScore={handleToggleScore} />
+      <AtScoreModal
+        toggleScore={toggleScore}
+        handleToggleScore={handleToggleScore}
+      />
     </div>
   );
 };

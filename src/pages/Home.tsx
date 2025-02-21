@@ -22,11 +22,12 @@ const Home = () => {
             Improve your resume & LinkedIn profile
           </h2>
           <p className="text-gray-300 text-lg mb-6">
-            Designed by top recruiters, our AI-powered platform instantly gives you
-            tailored feedback on your resume and LinkedIn profile.
+            Designed by top recruiters, our AI-powered platform instantly gives
+            you tailored feedback on your resume and LinkedIn profile.
           </p>
           <p className="text-gray-300 text-lg mb-8">
-            Land <span className="text-green-400 font-semibold">5x</span> more interviews, opportunities, and job offers.
+            Land <span className="text-green-400 font-semibold">5x</span> more
+            interviews, opportunities, and job offers.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -57,7 +58,8 @@ const Home = () => {
           Your personal resume & LinkedIn coach
         </h1>
         <p className="text-center text-gray-300">
-          Join over 1 million professionals, graduates, and students who have used our toolkit to advance their careers.
+          Join over 1 million professionals, graduates, and students who have
+          used our toolkit to advance their careers.
         </p>
 
         <div className="flex flex-wrap justify-center mt-6 gap-4">
@@ -65,8 +67,9 @@ const Home = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${activeTab === tab ? "border-white" : "border-transparent"
-                } hover:border-gray-300`}
+              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${
+                activeTab === tab ? "border-white" : "border-transparent"
+              } hover:border-gray-300`}
             >
               {tab}
             </button>
@@ -75,7 +78,7 @@ const Home = () => {
 
         <div className="mt-10 flex flex-col md:flex-row items-center gap-8">
           <div className="w-full md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-xl">
-            <video className="w-full rounded-lg" controls src="/path-to-video.mp4">
+            <video className="w-full rounded-lg" controls src="/vdo.mp4" loop>
               Your browser does not support the video tag.
             </video>
           </div>
@@ -85,14 +88,12 @@ const Home = () => {
               Get expert feedback on your resume, instantly
             </h2>
             <p className="text-gray-300">
-              Score My Resume evaluates your resume based on key criteria recruiters look for.
-              Upload your resume and get actionable insights within seconds.
+              Score My Resume evaluates your resume based on key criteria
+              recruiters look for. Upload your resume and get actionable
+              insights within seconds.
             </p>
             <button className="mt-4 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg transition-all">
-              <a
-                href="home"
-              >Upload Resume ➤
-              </a>
+              <a href="home">Upload Resume ➤</a>
             </button>
           </div>
         </div>

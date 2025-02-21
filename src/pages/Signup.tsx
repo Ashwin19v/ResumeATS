@@ -1,17 +1,33 @@
 import { useState, FormEvent } from "react";
 import { FaGoogle } from "react-icons/fa";
+import { auth, provider } from "../config/firebase";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const handleSignup = (e: FormEvent) => {
+  const handleSignup = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("Sign Up with:", email, password);
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert("Sign Up successful");
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleGoogleSignup = () => {
-    console.log("Sign Up with Google");
+  const handleGoogleSignup = async () => {
+    await signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -45,7 +61,7 @@ const Signup: React.FC = () => {
           </div>
 
           <button
-            type="submit"
+            onClick={handleSignup}
             className="w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg font-semibold transition"
           >
             Sign Up

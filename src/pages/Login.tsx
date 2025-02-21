@@ -1,17 +1,33 @@
 import { useState, FormEvent } from "react";
 import { FaGoogle } from "react-icons/fa";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../config/firebase";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const handleLogin = (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("Login with:", email, password);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Login successful");
+      navigate("/");
+    } catch (error) {
+      alert(error);
+    }
   };
 
   const handleGoogleLogin = () => {
-    console.log("Login with Google");
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
