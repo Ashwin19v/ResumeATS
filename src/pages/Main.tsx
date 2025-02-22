@@ -1,19 +1,31 @@
 import { useState } from "react";
-import Chatbot from "./components/Chatbot";
-import PdfUpload from "./components/PdfUpload";
-import PdfPreview from "./components/PdfPreview";
-import AtScoreModal from "./components/AtScoreModal";
+import { useNavigate } from "react-router-dom";
+import Chatbot from "../components/Chatbot";
+import PdfUpload from "../components/PdfUpload";
+import PdfPreview from "./PdfPreview";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage, faUser } from "@fortawesome/free-solid-svg-icons";
-
+import { useAppContext } from "../context/AppContext";
+import ResumeReview from "./ResumeReview";
 const Main = () => {
+  const navigate = useNavigate();
+  const { userName, setUserName, logout } = useAppContext();
+
   const [pdfFile, setPdfFile] = useState<string | null>(null);
   const [toggle, setToggle] = useState(false);
-  const [toggleScore, setToggleScore] = useState(false);
-  const [extractedText, setExtractedText] = useState<string>("");
+  const [jobDescription, setJobDescription] = useState<string>("");
 
   const handleToggle = () => setToggle(!toggle);
-  const handleToggleScore = () => setToggleScore(!toggleScore);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUserName("");
+      navigate("/");
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
@@ -23,29 +35,32 @@ const Main = () => {
         <div className="gap-4 items-center ">
           <div className="flex items-center gap-2">
             <FontAwesomeIcon icon={faUser} />
-            <a href="/">Log out</a>
+            <span>{userName}</span>
+            <button onClick={handleLogout} className="text-red-500 hover:underline">
+              Log out
+            </button>
           </div>
           <h2 className="text-lg font-bold text-center">
             Upload & Preview PDF
           </h2>
         </div>
 
-        <PdfUpload
-          setPdfFile={setPdfFile}
-          setExtractedText={setExtractedText}
-        />
+        <PdfUpload setPdfFile={setPdfFile} setExtractedText={() => { }} />
+        <ResumeReview />
 
-        <button
-          className="bg-blue-300 text-slate-800 mx-auto inline-block p-2 rounded-lg"
-          onClick={handleToggleScore}
-        >View ATS Score
-        </button>
 
         <div className="flex flex-col gap-8">
           <textarea
-            className="text-gray-400 bg-gray-800 p-4 rounded-lg w-full outline-none h-[200px] resize-none"
+            className="text-gray-400 bg-gray-800 p-4 rounded-lg w-full outline-none resize-none overflow-hidden"
             placeholder="Enter your job description here..."
+            value={jobDescription}
+            onChange={(e) => {
+              setJobDescription(e.target.value);
+              e.target.style.height = "auto"; // Reset height to recalculate
+              e.target.style.height = `${e.target.scrollHeight}px`; // Set height based on scrollHeight
+            }}
           ></textarea>
+
           <div className="flex justify-between items-center">
             <FontAwesomeIcon
               icon={faMessage}
@@ -58,14 +73,10 @@ const Main = () => {
             </button>
           </div>
         </div>
+
       </div>
 
       <PdfPreview pdfFile={pdfFile} />
-
-      <AtScoreModal
-        toggleScore={toggleScore}
-        handleToggleScore={handleToggleScore}
-      />
     </div>
   );
 };

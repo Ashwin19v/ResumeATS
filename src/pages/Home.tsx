@@ -2,9 +2,12 @@ import { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { homeImages } from "../../utils/resources/images";
-
+import { useAppContext } from "../context/AppContext";
 const Home = () => {
   const [activeTab, setActiveTab] = useState("INSTANT RESUME REVIEW");
+  const { userName } = useAppContext();
+  console.log(userName);
+
   const tabs = [
     "INSTANT RESUME REVIEW",
     "RESUME SAMPLES",
@@ -67,9 +70,8 @@ const Home = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${
-                activeTab === tab ? "border-white" : "border-transparent"
-              } hover:border-gray-300`}
+              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${activeTab === tab ? "border-white" : "border-transparent"
+                } hover:border-gray-300`}
             >
               {tab}
             </button>
@@ -92,9 +94,14 @@ const Home = () => {
               recruiters look for. Upload your resume and get actionable
               insights within seconds.
             </p>
-            <button className="mt-4 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg transition-all">
-              <a href="home">Upload Resume ➤</a>
-            </button>
+
+            {userName ? (
+              <button className="mt-4 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg transition-all">
+                <a href="home">Upload Resume ➤</a>
+              </button>
+            ) : (
+              <p className="mt-4 text-gray-300">Please log in to upload your resume.</p>
+            )}
           </div>
         </div>
       </div>

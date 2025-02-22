@@ -2,6 +2,7 @@ import React from "react";
 import { useDropzone } from "react-dropzone";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import * as pdfjsLib from "pdfjs-dist";
+import { useNavigate } from "react-router-dom";
 
 interface PdfUploadProps {
   setPdfFile: React.Dispatch<React.SetStateAction<string | null>>;
@@ -9,16 +10,19 @@ interface PdfUploadProps {
 }
 
 const PdfUpload = ({ setPdfFile, setExtractedText }: PdfUploadProps) => {
+  const navigate = useNavigate();
   const onDrop = async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file && file.type === "application/pdf") {
       const fileUrl = URL.createObjectURL(file);
       setPdfFile(fileUrl);
 
+
       const text = await extractTextFromPdf(file);
       const markdownText = convertToMarkdown(text);
       setExtractedText(markdownText);
-      console.log(markdownText);
+      console.log(text);
+
     } else {
       alert("Please upload a valid PDF file.");
     }
@@ -102,7 +106,9 @@ const PdfUpload = ({ setPdfFile, setExtractedText }: PdfUploadProps) => {
   return (
     <div
       {...getRootProps()}
-      className="p-6 h-[300px] flex flex-col items-center justify-center bg-gray-800 border border-gray-600 rounded-lg text-center cursor-pointer hover:bg-gray-700 transition-colors"
+      className="p-6 h-[300px] flex flex-col items-center justify-center bg-gray-800 border border-gray-600 
+      rounded-lg text-center cursor-pointer hover:bg-gray-700 transition-colors
+      my-8"
     >
       <input {...getInputProps()} />
 

@@ -4,17 +4,23 @@ import Signup from "./pages/Signup";
 import Main from "./pages/Main";
 import Home from "./pages/Home";
 import "./App.css";
+import AppContextProvider from "./context/AppContext";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Main />} />
-      </Routes>
-    </Router>
+    <AppContextProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<Home />} />
+          <Route element={<ProtectedRoutes />}>
+            <Route path="/home" element={<Main />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AppContextProvider>
   );
 };
 

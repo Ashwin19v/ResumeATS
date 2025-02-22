@@ -1,13 +1,16 @@
 import { useState, FormEvent } from "react";
-import { FaGoogle } from "react-icons/fa";
+import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const { setUserName } = useAppContext();
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -15,18 +18,22 @@ const Login: React.FC = () => {
       await signInWithEmailAndPassword(auth, email, password);
       alert("Login successful");
       navigate("/");
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 
   const handleGoogleLogin = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
-        console.log(result);
+        if (result.user) {
+          const name = result.user.displayName || "User";
+          setUserName(name);
+          navigate("/");
+        }
       })
       .catch((error) => {
-        console.log(error);
+        console.error("Google Login Error:", error);
       });
   };
 
@@ -48,16 +55,24 @@ const Login: React.FC = () => {
             />
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm">Password</label>
             <input
-              type="password"
-              className="w-full p-3 mt-1 bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500"
+              type={showPassword ? "text" : "password"}
+              className="w-full p-3 mt-1 bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10"
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <button
+              type="button"
+              className="absolute top-10 right-4 text-gray-400 hover:text-white"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
 
           <button
