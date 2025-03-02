@@ -1,12 +1,14 @@
 import { useState } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { homeImages } from "../../utils/resources/images";
+import Header from "../components/HomePage/Header";
+import Footer from "../components/HomePage/Footer";
+import resume_builder from "../assets/images/resume_builder.jpeg";
+import vdo from "../assets/videos/vdo.mp4";
 import { useAppContext } from "../context/AppContext";
+import { useNavigate } from "react-router-dom";
 const Home = () => {
   const [activeTab, setActiveTab] = useState("INSTANT RESUME REVIEW");
-  const { userName } = useAppContext();
-  console.log(userName);
+  const { user } = useAppContext();
+  const navigate = useNavigate();
 
   const tabs = [
     "INSTANT RESUME REVIEW",
@@ -16,7 +18,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="bg-gradient-to-b from-blue-950 to-violet-900 min-h-screen text-white font-sans">
+    <div className="bg-gradient-to-l from-gray-950 to-gray-800 min-h-screen text-white font-sans">
       <Header />
 
       <div className="container mx-auto px-6 lg:px-20 py-12 flex flex-col lg:flex-row items-center justify-between gap-12">
@@ -50,7 +52,7 @@ const Home = () => {
         <div className="lg:w-1/2">
           <img
             className="w-full rounded-lg shadow-2xl"
-            src={homeImages.heroImage}
+            src={resume_builder}
             alt="Resume Improvement"
           />
         </div>
@@ -70,8 +72,9 @@ const Home = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${activeTab === tab ? "border-white" : "border-transparent"
-                } hover:border-gray-300`}
+              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${
+                activeTab === tab ? "border-white" : "border-transparent"
+              } hover:border-gray-300`}
             >
               {tab}
             </button>
@@ -80,7 +83,13 @@ const Home = () => {
 
         <div className="mt-10 flex flex-col md:flex-row items-center gap-8">
           <div className="w-full md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-xl">
-            <video className="w-full rounded-lg" controls src="/vdo.mp4" loop>
+            <video
+              className="w-full rounded-lg"
+              controls
+              src={vdo}
+              loop
+              autoPlay
+            >
               Your browser does not support the video tag.
             </video>
           </div>
@@ -95,12 +104,17 @@ const Home = () => {
               insights within seconds.
             </p>
 
-            {userName ? (
-              <button className="mt-4 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg transition-all">
-                <a href="home">Upload Resume ➤</a>
+            {user ? (
+              <button
+                className="mt-4 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg transition-all"
+                onClick={() => navigate("/home")}
+              >
+                <a>Upload Resume ➤</a>
               </button>
             ) : (
-              <p className="mt-4 text-gray-300">Please log in to upload your resume.</p>
+              <p className="mt-4 text-gray-300">
+                Please log in to upload your resume.
+              </p>
             )}
           </div>
         </div>

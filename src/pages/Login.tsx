@@ -1,16 +1,18 @@
 import { useState, FormEvent } from "react";
 import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { auth, provider } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { setUserName } = useAppContext();
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -26,15 +28,22 @@ const Login: React.FC = () => {
   const handleGoogleLogin = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
-        if (result.user) {
-          const name = result.user.displayName || "User";
-          setUserName(name);
+        if (result) {
           navigate("/");
         }
       })
       .catch((error) => {
         console.error("Google Login Error:", error);
       });
+  };
+
+  const handlePasswordReset = async () => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("Password reset email sent!");
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -65,6 +74,7 @@ const Login: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+
             <button
               type="button"
               className="absolute top-10 right-4 text-gray-400 hover:text-white"
@@ -73,6 +83,12 @@ const Login: React.FC = () => {
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
+          </div>
+          <div
+            onClick={handlePasswordReset}
+            className="text-blue-500 hover:text-blue-600 text-right"
+          >
+            <p>Forgot Password</p>
           </div>
 
           <button
@@ -91,10 +107,12 @@ const Login: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-center justify-center mt-4">
-          <div className="mb-4 w-full text-center">
-            <span className="block w-full border-t border-gray-600 my-2"></span>
-            <span className="text-sm text-gray-400">Or login with</span>
-            <span className="block w-full border-t border-gray-600 my-2"></span>
+          <div className="mb-4 w-full flex items-center justify-center text-center">
+            <div className="w-full border-t border-gray-600"></div>
+            <span className="px-3 text-sm w-full text-gray-400 ">
+              Or login with
+            </span>
+            <div className="w-full border-t border-gray-600"></div>
           </div>
 
           <button

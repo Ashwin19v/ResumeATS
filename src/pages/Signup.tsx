@@ -1,13 +1,15 @@
 import { useState, FormEvent } from "react";
-import { FaGoogle } from "react-icons/fa";
+
 import { auth, provider } from "../config/firebase";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleSignup = async (e: FormEvent) => {
     e.preventDefault();
@@ -22,8 +24,8 @@ const Signup: React.FC = () => {
 
   const handleGoogleSignup = async () => {
     await signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log(result);
+      .then(() => {
+        navigate("/");
       })
       .catch((error) => {
         console.log(error);
@@ -48,18 +50,25 @@ const Signup: React.FC = () => {
             />
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm">Password</label>
             <input
-              type="password"
-              className="w-full p-3 mt-1 bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500"
+              type={showPassword ? "text" : "password"}
+              className="w-full p-3 mt-1 bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10"
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <button
+              type="button"
+              className="absolute top-10 right-4 text-gray-400 hover:text-white"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
-
           <button
             onClick={handleSignup}
             className="w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg font-semibold transition"
@@ -76,10 +85,12 @@ const Signup: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-center justify-center mt-4">
-          <div className="mb-4 w-full text-center">
-            <span className="block w-full border-t border-gray-600 my-2"></span>
-            <span className="text-sm text-gray-400">Or sign up with</span>
-            <span className="block w-full border-t border-gray-600 my-2"></span>
+          <div className="mb-4 w-full flex items-center justify-center text-center">
+            <div className="w-full border-t border-gray-600"></div>
+            <span className="px-3 text-sm w-full text-gray-400 ">
+              Or sign up with
+            </span>
+            <div className="w-full border-t border-gray-600"></div>
           </div>
 
           <button
