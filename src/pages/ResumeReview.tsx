@@ -39,17 +39,15 @@ const ResumeReview = ({
       <div className="flex justify-between items-center">
         <div className="flex gap-4">
           <h2
-            className={`${
-              currentPage === "Resume Analysis" ? "text-blue-400" : "text-white"
-            } font-bold text-xl`}
+            className={`${currentPage === "Resume Analysis" ? "text-blue-400" : "text-white"
+              } font-bold text-xl cursor-pointer`}
             onClick={() => setCurrentPage("Resume Analysis")}
           >
             Resume Analysis
           </h2>
           <h2
-            className={`${
-              currentPage === "Resume Review" ? "text-blue-400" : "text-white"
-            } font-bold text-xl`}
+            className={`${currentPage === "Resume Review" ? "text-blue-400" : "text-white"
+              } font-bold text-xl cursor-pointer`}
             onClick={() => setCurrentPage("Resume Review")}
           >
             Resume Review

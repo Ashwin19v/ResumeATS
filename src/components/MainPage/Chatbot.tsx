@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
+import { useAppContext } from "../../context/AppContext";
 
 interface Message {
   text: string;
@@ -16,6 +17,7 @@ const Chatbot = ({
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [queryData, setQueryData] = useState<any>(null);
 
   const handleSendMessage = (e: any) => {
     if (e.key === "Enter" || e.type === "click") {
@@ -55,9 +57,8 @@ const Chatbot = ({
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`mb-3 text-sm ${
-              msg.sender === "user" ? "text-blue-400" : "text-green-400"
-            }`}
+            className={`mb-3 text-sm ${msg.sender === "user" ? "text-blue-400" : "text-green-400"
+              }`}
           >
             <span className="font-bold">
               {msg.sender === "user" ? "You: " : "Bot: "}

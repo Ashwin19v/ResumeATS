@@ -1,17 +1,19 @@
 import React from "react";
 import { useDropzone } from "react-dropzone";
 import { FaCloudUploadAlt } from "react-icons/fa";
-
+import { useAppContext } from "../../context/AppContext";
 interface PdfUploadProps {
   setPdfFile: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const PdfUpload = ({ setPdfFile }: PdfUploadProps) => {
+  const { handleUploadResume } = useAppContext();
   const onDrop = async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file && file.type === "application/pdf") {
       const fileUrl = URL.createObjectURL(file);
       setPdfFile(fileUrl);
+      handleUploadResume(file);
     } else {
       alert("Please upload a valid PDF file.");
     }

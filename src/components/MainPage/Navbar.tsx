@@ -18,11 +18,10 @@ const Navbar = ({
   handleResumeReview: () => void;
 }) => {
   const navigate = useNavigate();
-  const { user, setUserName, logout } = useAppContext();
+  const { user, logout } = useAppContext();
   const handleLogout = async () => {
     try {
       await logout();
-      setUserName("");
       navigate("/");
     } catch (error) {
       console.error("Logout Error:", error);

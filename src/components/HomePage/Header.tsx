@@ -24,7 +24,7 @@ const Header = () => {
               to="/signup"
               className="hover:text-gray-900  bg-white text-blue-900 sm:px-4 sm:py-2 p-1 rounded-lg font-semibold text-md "
             >
-              Sign in
+              Sign up
             </Link>
             <Link
               to="/login"

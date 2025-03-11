@@ -1,9 +1,28 @@
-import resumeData from "../../../utils/resources/resumeData.json";
 import AtScoreModal from "./AtsScore";
-
+import { useAppContext } from "../../context/AppContext";
+type FeedbackKey = 'skills_match' | 'experience_relevance' | 'education_relevance' | 'overall_formatting';
 const ResumeReview = () => {
-  const data = resumeData;
+  const { setSelectedSection, setIsModalOpen, resumeData } = useAppContext();
   const similarityScore = resumeData.ats_score.ats_score.toFixed(2);
+
+  if (!resumeData) {
+    return <div>Loading...</div>;
+  }
+
+  const data = resumeData;
+  const handleSectionClick = (section: FeedbackKey) => {
+    setSelectedSection(section);
+    setIsModalOpen(true);
+  };
+
+
+  const sections: { key: FeedbackKey; title: string }[] = [
+    { key: 'skills_match', title: 'Skills Match' },
+    { key: 'experience_relevance', title: 'Experience Relevance' },
+    { key: 'education_relevance', title: 'Education Relevance' },
+    { key: 'overall_formatting', title: 'Overall Formatting' },
+  ];
+
   return (
     <div className="text-white bg-gray-900  p-2">
       <div className="max-w-4xl mx-auto shadow-2xl rounded-lg p-2 bg-gray-900">
@@ -22,7 +41,7 @@ const ResumeReview = () => {
             <p className="text-gray-300">
               Similarity Score:{" "}
               <span className="font-semibold text-green-400">
-                {data.similarity.toFixed(2)}
+                {parseInt(data.similarity).toFixed(2)}
               </span>
             </p>
             <h2 className=" font-semibold  mb-6 ">
@@ -84,7 +103,7 @@ const ResumeReview = () => {
                 Strengths
               </h3>
               <ul className="list-disc list-inside text-gray-200">
-                {data.ats_score.feedback.strengths.map((strength, index) => (
+                {data.ats_score.feedback.strengths.map((strength: string, index: number) => (
                   <li key={index} className="mb-2">
                     {strength}
                   </li>
@@ -98,7 +117,7 @@ const ResumeReview = () => {
               <ul className="list-disc list-inside text-gray-200">
                 {data.ats_score.feedback.improvements.length > 0 ? (
                   data.ats_score.feedback.improvements.map(
-                    (improvement, index) => (
+                    (improvement: string, index: number) => (
                       <li key={index} className="mb-2">
                         {improvement}
                       </li>
@@ -118,102 +137,35 @@ const ResumeReview = () => {
             Detailed Feedback
           </h2>
           <div className="space-y-6">
-            {/* Skills Match */}
-            <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-medium text-blue-400 mb-4">
-                Skills Match
-              </h3>
-              <p className="text-gray-200">
-                <strong className="text-blue-300">Matching Elements:</strong>{" "}
-                {data.ats_score.detailed_feedback.skills_match.matching_elements.join(
-                  ", "
-                )}
-              </p>
-              <p className="text-gray-200">
-                <strong className="text-blue-300">Missing Elements:</strong>{" "}
-                {data.ats_score.detailed_feedback.skills_match.missing_elements.join(
-                  ", "
-                )}
-              </p>
-              <p className="text-gray-200 mt-2">
-                {data.ats_score.detailed_feedback.skills_match.explanation}
-              </p>
-            </div>
-
-            {/* Experience Relevance */}
-            <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-medium text-blue-400 mb-4">
-                Experience Relevance
-              </h3>
-              <p className="text-gray-200">
-                <strong className="text-blue-300">Matching Elements:</strong>{" "}
-                {data.ats_score.detailed_feedback.experience_relevance.matching_elements.join(
-                  ", "
-                )}
-              </p>
-              <p className="text-gray-200">
-                <strong className="text-blue-300">Missing Elements:</strong>{" "}
-                {data.ats_score.detailed_feedback.experience_relevance.missing_elements.join(
-                  ", "
-                )}
-              </p>
-              <p className="text-gray-200 mt-2">
-                {
-                  data.ats_score.detailed_feedback.experience_relevance
-                    .explanation
-                }
-              </p>
-            </div>
-
-            {/* Education Relevance */}
-            <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-medium text-blue-400 mb-4">
-                Education Relevance
-              </h3>
-              <p className="text-gray-200">
-                <strong className="text-blue-300">Matching Elements:</strong>{" "}
-                {data.ats_score.detailed_feedback.education_relevance.matching_elements.join(
-                  ", "
-                )}
-              </p>
-              <p className="text-gray-200">
-                <strong className="text-blue-300">Missing Elements:</strong>{" "}
-                {data.ats_score.detailed_feedback.education_relevance.missing_elements.join(
-                  ", "
-                )}
-              </p>
-              <p className="text-gray-200 mt-2">
-                {
-                  data.ats_score.detailed_feedback.education_relevance
-                    .explanation
-                }
-              </p>
-            </div>
-
-            {/* Overall Formatting */}
-            <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-medium text-blue-400 mb-4">
-                Overall Formatting
-              </h3>
-              <p className="text-gray-200">
-                <strong className="text-blue-300">Matching Elements:</strong>{" "}
-                {data.ats_score.detailed_feedback.overall_formatting.matching_elements.join(
-                  ", "
-                )}
-              </p>
-              <p className="text-gray-200">
-                <strong className="text-blue-300">Missing Elements:</strong>{" "}
-                {data.ats_score.detailed_feedback.overall_formatting.missing_elements.join(
-                  ", "
-                )}
-              </p>
-              <p className="text-gray-200 mt-2">
-                {
-                  data.ats_score.detailed_feedback.overall_formatting
-                    .explanation
-                }
-              </p>
-            </div>
+            {sections.map((section) => (
+              <div
+                key={section.key}
+                className="bg-gray-700 p-6 rounded-lg shadow-md relative group"
+              >
+                <h3 className="text-xl font-medium text-blue-400 mb-4">{section.title}</h3>
+                <p className="text-gray-200">
+                  <strong className="text-blue-300">Matching Elements:</strong>{" "}
+                  {data.ats_score.detailed_feedback[section.key].matching_elements.join(", ")}
+                </p>
+                <p className="text-gray-200">
+                  <strong className="text-blue-300">Missing Elements:</strong>{" "}
+                  {data.ats_score.detailed_feedback[section.key].missing_elements.join(", ")}
+                </p>
+                <p className="text-gray-200 mt-2">
+                  {data.ats_score.detailed_feedback[section.key].explanation}
+                </p>
+                <button
+                  className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-lg 
+                  opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  onClick={() => {
+                    setSelectedSection(section.key);
+                    handleSectionClick(section.key);
+                  }}
+                >
+                  Ask our bot
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </div>

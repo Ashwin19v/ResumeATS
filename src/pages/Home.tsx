@@ -4,7 +4,7 @@ import Footer from "../components/HomePage/Footer";
 import resume_builder from "../assets/images/resume_builder.jpeg";
 import vdo from "../assets/videos/vdo.mp4";
 import { useAppContext } from "../context/AppContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 const Home = () => {
   const [activeTab, setActiveTab] = useState("INSTANT RESUME REVIEW");
   const { user } = useAppContext();
@@ -36,13 +36,12 @@ const Home = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <a
-              href="signup"
-              rel="noreferrer"
+            <Link
+              to={`${user ? "/home" : "/signup"}`}
               className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl text-center"
             >
               Get Started for Free ➤
-            </a>
+            </Link>
             <button className="bg-transparent border-2 border-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl">
               See Preview ➤
             </button>
@@ -72,9 +71,8 @@ const Home = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${
-                activeTab === tab ? "border-white" : "border-transparent"
-              } hover:border-gray-300`}
+              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${activeTab === tab ? "border-white" : "border-transparent"
+                } hover:border-gray-300`}
             >
               {tab}
             </button>

@@ -15,24 +15,28 @@ import ResumeReview from "./ResumeReview.tsx";
 import Navbar from "../components/MainPage/Navbar";
 
 const Main = () => {
-  const { user } = useAppContext();
+  const { user, isModalOpen, setIsModalOpen } = useAppContext();
 
   const [pdfFile, setPdfFile] = useState<string | null>(null);
-  const [toggle, setToggle] = useState(false);
   const [jobDescription, setJobDescription] = useState<string>("");
   const [resumeReview, setResumeReview] = useState<boolean>(false);
   const [toggleNav, setToggleNav] = useState<boolean>(false);
+  const processResume = useAppContext().handleProcessResume;
 
-  const handleToggle = () => setToggle(!toggle);
   const handleToggleNav = () => setToggleNav(!toggleNav);
 
   const handleResumeReview = () => {
+    processResume();
     setResumeReview(!resumeReview);
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(!isModalOpen);
   };
 
   return (
     <div className="flex w-full  bg-gray-900 text-white flex-wrap ">
-      <Chatbot toggle={toggle} handleToggle={handleToggle} />
+      <Chatbot toggle={isModalOpen} handleToggle={handleOpenModal} />
 
       <div className="p-5  h-screen flex flex-col   w-full sm:w-[50%] border-r-2 border- border-gray-600">
         <div className="mb-6 space-y-4">
@@ -104,7 +108,7 @@ const Main = () => {
             <FontAwesomeIcon
               icon={faMessage}
               bounce={true}
-              onClick={handleToggle}
+              onClick={handleOpenModal}
               className="bg-blue-600 hover:bg-blue-700 transition-colors p-3 rounded-full h-5 cursor-pointer"
             />
             <button

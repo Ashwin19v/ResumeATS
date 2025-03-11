@@ -4,7 +4,7 @@ import Signup from "./pages/Signup";
 import Main from "./pages/Main";
 import Home from "./pages/Home";
 import "./App.css";
-import AppContextProvider from "./context/AppContext";
+import { AppContextProvider } from "./context/AppContext";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import Resume from "./pages/Resume";
 
