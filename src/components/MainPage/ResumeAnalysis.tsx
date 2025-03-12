@@ -1,20 +1,27 @@
-import resumeData from "../../../utils/resources/resumeData.json";
 import AtScoreModal from "./AtsScore";
+import { useAppContext } from "../../context/AppContext";
 
 const ResumeAnalysis = () => {
-  const similarityScore = resumeData.ats_score.ats_score.toFixed(2);
+  const { resumeData } = useAppContext();
+
+  if (!resumeData) {
+    return <div>Loading...</div>;
+  }
+
+  const similarityScore = resumeData.ats_score?.ats_score?.toFixed(2) || "0.00";
   const previewPage = () => {
-    window.open("/resume", "_blank");
+    window.open("/resume");
   };
 
   const printPage = () => {
-    const newWindow = window.open("/resume", "_blank");
+    const newWindow = window.open("/resume");
     if (newWindow) {
       newWindow.onload = () => {
         newWindow.print();
       };
     }
   };
+
   return (
     <div className="flex gap-6">
       <div className="flex-1">
@@ -24,13 +31,13 @@ const ResumeAnalysis = () => {
               <div>
                 <h3 className="text-lg font-bold">Candidate Details</h3>
                 <p>
-                  <strong>Name:</strong> {resumeData.structured_data.name}
+                  <strong>Name:</strong> {resumeData.structured_data?.name}
                 </p>
                 <p>
-                  <strong>Email:</strong> {resumeData.structured_data.email}
+                  <strong>Email:</strong> {resumeData.structured_data?.email}
                 </p>
                 <p>
-                  <strong>Phone:</strong> {resumeData.structured_data.phone}
+                  <strong>Phone:</strong> {resumeData.structured_data?.phone}
                 </p>
               </div>
             </div>
@@ -43,7 +50,7 @@ const ResumeAnalysis = () => {
           <div className="mt-6">
             <h3 className="text-lg font-bold">Skills</h3>
             <ul className="mx-2 flex flex-wrap gap-2 items-center">
-              {resumeData.structured_data.skills.map((skill, index) => (
+              {resumeData.structured_data?.skills?.map((skill, index) => (
                 <li
                   key={index}
                   className="bg-gray-800 px-2 py-1 rounded-md hover:bg-gray-700"
@@ -57,7 +64,7 @@ const ResumeAnalysis = () => {
           {/* Experience Section */}
           <div className="mt-6">
             <h3 className="text-lg font-bold">Experience</h3>
-            {resumeData.structured_data.experience.map((exp, index) => (
+            {resumeData.structured_data?.experience?.map((exp, index) => (
               <div
                 key={index}
                 className="mb-4 p-4 border border-gray-700 rounded-lg"
@@ -76,7 +83,7 @@ const ResumeAnalysis = () => {
           {/* Education Section */}
           <div className="mt-6">
             <h3 className="text-lg font-bold">Education</h3>
-            {resumeData.structured_data.education.map((edu, index) => (
+            {resumeData.structured_data?.education?.map((edu, index) => (
               <div
                 key={index}
                 className="mb-4 p-4 border border-gray-700 rounded-lg"
@@ -96,9 +103,11 @@ const ResumeAnalysis = () => {
           <div className="mt-6">
             <h3 className="text-lg font-bold">Certifications</h3>
             <ul className="list-disc pl-5">
-              {resumeData.structured_data.certifications.map((cert, index) => (
-                <li key={index}>{cert}</li>
-              ))}
+              {resumeData.structured_data?.certifications?.map(
+                (cert, index) => (
+                  <li key={index}>{cert}</li>
+                )
+              )}
             </ul>
           </div>
 
@@ -106,8 +115,8 @@ const ResumeAnalysis = () => {
           <div className="mt-6">
             <h3 className="text-lg font-bold">Areas of Interest</h3>
             <ul className="list-disc pl-5">
-              {resumeData.structured_data.areas_of_interest.map(
-                (interest, index) => (
+              {resumeData.structured_data?.areas_of_interest?.map(
+                (interest: string, index: number) => (
                   <li key={index}>{interest}</li>
                 )
               )}

@@ -1,6 +1,7 @@
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import pdf from "../assets/images/pdf.png";
+// import { useAppContext } from "../context/AppContext";
 
 interface PdfPreviewProps {
   pdfFile: string | null;
@@ -8,6 +9,7 @@ interface PdfPreviewProps {
 }
 
 const PdfPreview = ({ pdfFile, resumeReview }: PdfPreviewProps) => {
+  // const { progress } = useAppContext();
   return (
     <div
       className={`h-screen  bg-gray-900  overflow-auto ${
@@ -15,6 +17,8 @@ const PdfPreview = ({ pdfFile, resumeReview }: PdfPreviewProps) => {
       }`}
     >
       <div className="w-full h-full">
+        {/* <div>{progress}</div> */}
+
         {pdfFile ? (
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
             <Viewer fileUrl={pdfFile} />

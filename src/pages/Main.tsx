@@ -15,18 +15,29 @@ import ResumeReview from "./ResumeReview.tsx";
 import Navbar from "../components/MainPage/Navbar";
 
 const Main = () => {
-  const { user, isModalOpen, setIsModalOpen } = useAppContext();
+  const {
+    user,
+    isModalOpen,
+    setIsModalOpen,
+    fileUrl,
+    handleProcessResume,
+    jobDescription,
+    setJobDescription,
+  } = useAppContext();
 
   const [pdfFile, setPdfFile] = useState<string | null>(null);
-  const [jobDescription, setJobDescription] = useState<string>("");
+
   const [resumeReview, setResumeReview] = useState<boolean>(false);
   const [toggleNav, setToggleNav] = useState<boolean>(false);
-  const processResume = useAppContext().handleProcessResume;
 
   const handleToggleNav = () => setToggleNav(!toggleNav);
 
   const handleResumeReview = () => {
-    processResume();
+    if (!pdfFile || !jobDescription || !fileUrl) {
+      alert("Please upload a resume and provide a job description");
+      return;
+    }
+    handleProcessResume(jobDescription);
     setResumeReview(!resumeReview);
   };
 
@@ -91,7 +102,7 @@ const Main = () => {
         <div className="flex flex-col my-4">
           <select
             className="text-gray-400 bg-gray-800 p-4  rounded-lg w-full outline-none"
-            value={jobDescription}
+            value={jobDescription || ""}
             onChange={(e) => {
               setJobDescription(e.target.value);
             }}

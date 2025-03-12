@@ -1,9 +1,10 @@
 import { useAppContext } from "../context/AppContext";
 
 const Resume = () => {
-  const { user } = useAppContext();
+  const { user, resumeData } = useAppContext();
+  console.log(user, resumeData);
 
-  if (user === null) {
+  if (user === null || resumeData === null) {
     return (
       <div className="h-screen flex flex-col justify-center items-center w-full sm:w-[50%] bg-gray-900">
         <h1 className="text-white text-2xl font-bold animate-pulse">
@@ -13,25 +14,32 @@ const Resume = () => {
       </div>
     );
   }
+
+  const { structured_data } = resumeData;
+
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white  text-sm">
+    <div className="max-w-4xl mx-auto p-6 bg-white text-sm">
       <header className="text-center mb-4">
-        <h1 className="text-2xl font-bold text-gray-900">ASHWIN V</h1>
-        <p className="text-gray-700">995659675, Chennai, TamilNadu</p>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {structured_data?.name}
+        </h1>
+        <p className="text-gray-700">
+          {structured_data?.phone}, {structured_data?.location}
+        </p>
         <p className="text-blue-500">
-          <a href="mailto:vdeepakvaithe@gmail.com" className="hover:underline">
+          <a
+            href={`mailto:${structured_data?.email}`}
+            className="hover:underline"
+          >
             Email
           </a>{" "}
           |
-          <a
-            href="https://linkedin.com/in/Deepakkumar"
-            className="hover:underline"
-          >
+          <a href={structured_data?.linkedin} className="hover:underline">
             {" "}
             LinkedIn
           </a>{" "}
           |
-          <a href="https://github.com/Deepakkumar" className="hover:underline">
+          <a href={structured_data?.github} className="hover:underline">
             {" "}
             GitHub
           </a>
@@ -40,38 +48,40 @@ const Resume = () => {
 
       <section className="mb-4 border-b pb-2">
         <h2 className="text-lg font-semibold text-gray-800">OBJECTIVE</h2>
-        <p className="text-gray-700">
-          Software Engineer with 3 years in MERN Stack, seeking a Full Stack,
-          Frontend, or Backend role.
-        </p>
+        <p className="text-gray-700">{structured_data?.objective}</p>
       </section>
 
       <section className="mb-4 border-b pb-2">
         <h2 className="text-lg font-semibold text-gray-800">EDUCATION</h2>
-        <p className="text-gray-700">
-          <strong>Bachelor’s in Automobile Engineering</strong>, MIT, Anna
-          University (2017 - 2021)
-        </p>
+        {structured_data?.education?.map((edu, index) => (
+          <p key={index} className="text-gray-700">
+            <strong>{edu.degree}</strong>, {edu.institution} ({edu.start_date} -{" "}
+            {edu.end_date})
+          </p>
+        ))}
       </section>
 
       <section className="mb-4 border-b pb-2">
         <h2 className="text-lg font-semibold text-gray-800">SKILLS</h2>
-        <div className=" text-gray-700">
+        <div className="text-gray-700">
           <div>
             <p>
-              <strong>Frontend:</strong> React.js, Redux, Next.js, HTML, CSS,
-              Tailwind
+              <strong>Frontend:</strong>{" "}
+              {structured_data?.skills?.frontend?.join(", ")}
             </p>
             <p>
-              <strong>Backend:</strong> Node.js, Express.js, JWT, Auth0
+              <strong>Backend:</strong>{" "}
+              {structured_data?.skills?.backend?.join(", ")}
             </p>
           </div>
           <div>
             <p>
-              <strong>Databases:</strong> MongoDB, MySQL
+              <strong>Databases:</strong>{" "}
+              {structured_data?.skills?.databases?.join(", ")}
             </p>
             <p>
-              <strong>Tools:</strong> GitHub, Jenkins, Postman, VS Code, Figma
+              <strong>Tools:</strong>{" "}
+              {structured_data?.skills?.tools?.join(", ")}
             </p>
           </div>
         </div>
@@ -79,31 +89,36 @@ const Resume = () => {
 
       <section className="mb-4 border-b pb-2">
         <h2 className="text-lg font-semibold text-gray-800">EXPERIENCE</h2>
-        <h3 className="text-md font-semibold text-gray-900">
-          Senior Software Engineer
-        </h3>
-        <p className="text-gray-600">
-          Solaritis Technology Services Pvt Ltd (Sept 2021 - Present)
-        </p>
-        <ul className="list-disc pl-5 text-gray-700">
-          <li>Built React & Node.js app with MongoDB & Express.</li>
-          <li>Used Redux for state management & reusable components.</li>
-          <li>Developed no-code UI with React & MySQL.</li>
-        </ul>
+        {structured_data?.experience?.map((exp, index) => (
+          <div key={index}>
+            <h3 className="text-md font-semibold text-gray-900">{exp.title}</h3>
+            <p className="text-gray-600">
+              {exp.company} ({exp.start_date} - {exp.end_date})
+            </p>
+            <ul className="list-disc pl-5 text-gray-700">
+              {exp.responsibilities?.map((responsibility, idx) => (
+                <li key={idx}>{responsibility}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </section>
 
       <section className="mb-4 border-b pb-2">
         <h2 className="text-lg font-semibold text-gray-800">PROJECTS</h2>
-        <p className="text-gray-700">
-          Todo List App - Built using React, Node.js, Express, and MongoDB.
-        </p>
+        {structured_data?.projects?.map((project, index) => (
+          <p key={index} className="text-gray-700">
+            {project.name} - {project.description}
+          </p>
+        ))}
       </section>
 
       <section className="mb-4 border-b pb-2">
         <h2 className="text-lg font-semibold text-gray-800">CERTIFICATIONS</h2>
         <ul className="list-disc pl-5 text-gray-700">
-          <li>React.js - Context API & Redux.</li>
-          <li>HTML, CSS, JS - Web Development.</li>
+          {structured_data?.certifications?.map((cert, index) => (
+            <li key={index}>{cert}</li>
+          ))}
         </ul>
       </section>
 
@@ -112,16 +127,15 @@ const Resume = () => {
           EXTRA-CURRICULAR
         </h2>
         <ul className="list-disc pl-5 text-gray-700">
-          <li>Contributing to Open-Source.</li>
-          <li>Learning DSA.</li>
+          {structured_data?.extra_curricular?.map((activity, index) => (
+            <li key={index}>{activity}</li>
+          ))}
         </ul>
       </section>
 
       <section className="mb-4">
         <h2 className="text-lg font-semibold text-gray-800">LEADERSHIP</h2>
-        <p className="text-gray-700">
-          Mentored 3 developers, guiding team collaboration & knowledge-sharing.
-        </p>
+        <p className="text-gray-700">{structured_data?.leadership}</p>
       </section>
     </div>
   );

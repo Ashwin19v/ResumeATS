@@ -19,7 +19,7 @@ const AtScoreModal: React.FC<AtScoreModalProps> = ({ atsScore }) => {
         trail: { stroke: "#374151" },
         text: {
           fill: "#fff",
-          fontSize: "16px",
+          fontSize: "22px",
           fontWeight: "bold",
         },
       }}

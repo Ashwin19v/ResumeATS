@@ -5,23 +5,72 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../config/firebase";
 import axios from "axios";
 
-type FeedbackKey = 'skills_match' | 'experience_relevance' | 'education_relevance' | 'overall_formatting';
+interface Message {
+  text: string;
+  sender: "user" | "bot";
+}
+type FeedbackKey =
+  | "skills_match"
+  | "experience_relevance"
+  | "education_relevance"
+  | "overall_formatting";
 interface AppContextProps {
   user: User | null;
   loading: boolean;
+  messages: Message[];
+  isBotTyping: boolean;
   isModalOpen: boolean;
-  selectedSection: FeedbackKey | null;
-  resumeData: any;
+  progress: number;
+  jobDescription: string | null;
+  selectedSection: { section: string; content: string }[] | null;
+  resumeData: ResumeData | null;
   logout: () => Promise<void>;
   handleUploadResume: (file: File) => Promise<void>;
-  setSelectedSection: (section: FeedbackKey | null) => void;
-  setIsModalOpen: (open: boolean) => void;
-  handleProcessResume: () => Promise<void>;
-  setResumeData: (data: any) => void;
+  setSelectedSection: React.Dispatch<
+    React.SetStateAction<{ section: string; content: string }[] | null>
+  >;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  handleProcessResume: (jobDescription: string) => Promise<void>;
+  handleChatPrompt: (jobDescription: string, prompt: string) => Promise<void>;
+  setResumeData: React.Dispatch<React.SetStateAction<ResumeData | null>>;
+  fileUrl: string | null;
+  setJobDescription: React.Dispatch<React.SetStateAction<string | null>>;
+}
+interface Experience {
+  title: string;
+  company: string;
+  start_date: string;
+  end_date: string;
+  description: string;
+}
+
+interface Education {
+  institution: string;
+  degree: string;
+  gpa: string;
+  start_date: string;
+  end_date: string;
+}
+
+interface ResumeData {
+  user_id: string;
+  ats_score: {
+    ats_score: number;
+  };
+  structured_data: {
+    name: string;
+    email: string;
+    phone: string;
+    skills: string[];
+    experience: Experience[];
+    education: Education[];
+    certifications: string[];
+    areas_of_interest: string[];
+  };
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
-
 
 function useAppContext() {
   const context = useContext(AppContext);
@@ -31,18 +80,20 @@ function useAppContext() {
   return context;
 }
 
-
-
-
 function AppContextProvider({ children }: { children: React.ReactNode }) {
   const baseUrl = "https://harish20205-resume-ats.hf.space";
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedSection, setSelectedSection] = useState<FeedbackKey | null>(null);
+  const [progress, setProgress] = useState<number>(0);
+  const [selectedSection, setSelectedSection] = useState<
+    { section: string; content: string }[] | null
+  >(null);
+  const [jobDescription, setJobDescription] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
-  const [resumeData, setResumeData] = useState<any>(null);
-
+  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
+  const [isBotTyping, setIsBotTyping] = useState<boolean>(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -51,7 +102,6 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUser(null);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -65,7 +115,7 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
           console.log("Upload is " + progress + "% done");
         },
         (error) => {
@@ -77,13 +127,8 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
             const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
             console.log("File available at", downloadUrl);
             setFileUrl(downloadUrl);
-            const response = await axios.post(`${baseUrl}/resume`, {
-              url: downloadUrl,
-              uid: user?.uid,
-            });
-            console.log("Server response:", response.data);
           } catch (error) {
-            console.error("Error getting download URL or saving to server:", error);
+            console.error("Error getting download URL:", error);
             throw error;
           }
         }
@@ -94,30 +139,68 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const handleProcessResume = async () => {
+  const handleProcessResume = async (jobDescription: string) => {
     try {
-      const response = await fetch(`${baseUrl}/process_resume/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      setLoading(true);
+      const response = await axios.post(
+        `${baseUrl}/process_resume/`,
+        {
           user_id: user?.uid,
           file_link: fileUrl,
-          job_description: "Software Engineer",
-        }),
-
-      })
-      const data = await response.json();
-      console.log(data);
-      setResumeData(data);
+          job_description: jobDescription,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response.data);
+      setResumeData(response.data);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error("Error processing resume:", error);
       throw error;
     }
   };
 
+  const handleChatPrompt = async (prompt: string) => {
+    try {
+      const userMessage: Message = { text: prompt, sender: "user" };
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
 
+      const response = await axios.post(`${baseUrl}/process_change/`, {
+        user_id: user?.uid,
+        section: selectedSection[0]?.section,
+        prompt: prompt,
+        content: selectedSection[0]?.content,
+        job_description: jobDescription,
+      });
+
+      setIsBotTyping(true);
+      const botResponse = response.data.modified_content;
+      let displayedText = "";
+
+      const botTypingMessage: Message = { text: "Typing...", sender: "bot" };
+      setMessages((prevMessages) => [...prevMessages, botTypingMessage]);
+
+      for (let i = 0; i < botResponse.length; i++) {
+        displayedText += botResponse[i];
+        setMessages((prevMessages) => [
+          ...prevMessages.slice(0, -1),
+          { text: displayedText, sender: "bot" },
+        ]);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+
+      setIsBotTyping(false);
+    } catch (error) {
+      console.error("Error fetching chat prompt:", error);
+      setIsBotTyping(false);
+      throw error;
+    }
+  };
   const logout = async () => {
     await signOut(auth);
 
@@ -126,7 +209,27 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider
-      value={{ user, loading, logout, handleUploadResume, selectedSection, setSelectedSection, isModalOpen, setIsModalOpen, handleProcessResume, resumeData, setResumeData }}
+      value={{
+        isBotTyping,
+        jobDescription,
+        setJobDescription,
+        messages,
+        setMessages,
+        handleChatPrompt,
+        progress,
+        user,
+        loading,
+        logout,
+        handleUploadResume,
+        selectedSection,
+        setSelectedSection,
+        isModalOpen,
+        setIsModalOpen,
+        handleProcessResume,
+        resumeData,
+        setResumeData,
+        fileUrl,
+      }}
     >
       {children}
     </AppContext.Provider>

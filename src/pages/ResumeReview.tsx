@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import "react-circular-progressbar/dist/styles.css";
 import gif from "../assets/gifs/gif.gif";
-
 import ResumeAnalysis from "../components/MainPage/ResumeAnalysis";
 import ResumeFeedback from "../components/MainPage/ResumeFeedback";
+import { useAppContext } from "../context/AppContext";
 
 const ResumeReview = ({
   setResumeReview,
@@ -11,16 +11,7 @@ const ResumeReview = ({
   setResumeReview: (value: boolean) => void;
 }) => {
   const [currentPage, setCurrentPage] = useState<string>("Resume Analysis");
-
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 10000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const { loading } = useAppContext();
 
   if (loading) {
     return (
@@ -39,15 +30,17 @@ const ResumeReview = ({
       <div className="flex justify-between items-center">
         <div className="flex gap-4">
           <h2
-            className={`${currentPage === "Resume Analysis" ? "text-blue-400" : "text-white"
-              } font-bold text-xl cursor-pointer`}
+            className={`${
+              currentPage === "Resume Analysis" ? "text-blue-400" : "text-white"
+            } font-bold text-xl cursor-pointer`}
             onClick={() => setCurrentPage("Resume Analysis")}
           >
             Resume Analysis
           </h2>
           <h2
-            className={`${currentPage === "Resume Review" ? "text-blue-400" : "text-white"
-              } font-bold text-xl cursor-pointer`}
+            className={`${
+              currentPage === "Resume Review" ? "text-blue-400" : "text-white"
+            } font-bold text-xl cursor-pointer`}
             onClick={() => setCurrentPage("Resume Review")}
           >
             Resume Review

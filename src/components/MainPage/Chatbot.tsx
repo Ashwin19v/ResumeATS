@@ -3,11 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
 import { useAppContext } from "../../context/AppContext";
 
-interface Message {
-  text: string;
-  sender: "user" | "bot";
-}
-
 const Chatbot = ({
   toggle,
   handleToggle,
@@ -15,22 +10,15 @@ const Chatbot = ({
   toggle: boolean;
   handleToggle: () => void;
 }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [queryData, setQueryData] = useState<any>(null);
+  const { handleChatPrompt, messages, selectedSection, isBotTyping } =
+    useAppContext();
 
   const handleSendMessage = (e: any) => {
     if (e.key === "Enter" || e.type === "click") {
       if (input.trim() !== "") {
-        setMessages([...messages, { text: input, sender: "user" }]);
+        handleChatPrompt(input, "");
         setInput("");
-
-        setTimeout(() => {
-          setMessages((prev) => [
-            ...prev,
-            { text: "Hello! How can I help?", sender: "bot" },
-          ]);
-        }, 1000);
       } else {
         alert("Please enter a message");
       }
@@ -57,8 +45,9 @@ const Chatbot = ({
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`mb-3 text-sm ${msg.sender === "user" ? "text-blue-400" : "text-green-400"
-              }`}
+            className={`mb-3 text-sm ${
+              msg.sender === "user" ? "text-blue-400" : "text-green-400"
+            }`}
           >
             <span className="font-bold">
               {msg.sender === "user" ? "You: " : "Bot: "}
@@ -66,22 +55,38 @@ const Chatbot = ({
             {msg.text}
           </div>
         ))}
+        {isBotTyping && (
+          <div className="mb-3 text-sm text-green-400">
+            <span className="font-bold animate-pulse"> Typing...</span>
+          </div>
+        )}
       </div>
-      <div className="mt-4 flex">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => handleSendMessage(e)}
-          placeholder="Type a message..."
-          className="flex-1 p-2 bg-gray-800 rounded-lg text-white outline-none"
-        />
-        <button
-          onClick={(e) => handleSendMessage(e)}
-          className="ml-2 px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Send
-        </button>
+
+      <div className="mt-4 flex flex-col space-y-4">
+        {selectedSection && (
+          <div className="bg-gray-800 p-3 rounded-lg">
+            <div className="text-white font-semibold">
+              {selectedSection[0].section}
+            </div>
+            <div className="text-gray-300">{selectedSection[0].content}</div>
+          </div>
+        )}
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => handleSendMessage(e)}
+            placeholder="Type a message..."
+            className="flex-1 p-2 bg-gray-800 rounded-lg text-white outline-none"
+          />
+          <button
+            onClick={(e) => handleSendMessage(e)}
+            className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Send
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import "./App.css";
 import { AppContextProvider } from "./context/AppContext";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import Resume from "./pages/Resume";
+import ProfilePage from "./pages/Profile";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/resume" element={<Resume />} />
           <Route element={<ProtectedRoutes />}>
             <Route path="/home" element={<Main />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Routes>
       </Router>
