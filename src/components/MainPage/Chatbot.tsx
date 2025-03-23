@@ -2,6 +2,8 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
 import { useAppContext } from "../../context/AppContext";
+import bot from "../../assets/images/bot.webp";
+import { showToast } from "../ToastNotification";
 
 const Chatbot = ({
   toggle,
@@ -11,7 +13,7 @@ const Chatbot = ({
   handleToggle: () => void;
 }) => {
   const [input, setInput] = useState("");
-  const { handleChatPrompt, messages, selectedSection, isBotTyping } =
+  const { handleChatPrompt, messages, selectedSection, isBotTyping, user } =
     useAppContext();
 
   const handleSendMessage = (e: any) => {
@@ -20,7 +22,7 @@ const Chatbot = ({
         handleChatPrompt(input, "");
         setInput("");
       } else {
-        alert("Please enter a message");
+        showToast("Please enter a message", "warning");
       }
     }
   };
@@ -41,23 +43,48 @@ const Chatbot = ({
         />
       </div>
 
-      <div className="h-full overflow-y-auto bg-gray-800 p-4 rounded-lg">
+      <div className="h-full overflow-y-auto bg-gray-800 p-4 rounded-lg space-y-4">
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`mb-3 text-sm ${
-              msg.sender === "user" ? "text-blue-400" : "text-green-400"
+            className={`mb-3 text-sm flex items-start space-x-2 ${
+              msg.sender === "user"
+                ? " justify-end items-center"
+                : "items-center"
             }`}
           >
-            <span className="font-bold">
-              {msg.sender === "user" ? "You: " : "Bot: "}
-            </span>
-            {msg.text}
+            {msg.sender !== "user" && (
+              <img
+                src={bot}
+                alt="Bot Avatar"
+                className="rounded-full h-6 w-6"
+              />
+            )}
+            <div
+              className={`p-3 rounded-lg ${
+                msg.sender === "user"
+                  ? "bg-blue-600 text-white "
+                  : "bg-gray-700 text-white"
+              }`}
+            >
+              {msg.text}
+            </div>
+            {msg.sender === "user" && user?.photoURL && (
+              <img
+                src={user.photoURL}
+                alt="User Avatar"
+                className="rounded-full h-6 w-6"
+              />
+            )}
           </div>
         ))}
         {isBotTyping && (
-          <div className="mb-3 text-sm text-green-400">
-            <span className="font-bold animate-pulse"> Typing...</span>
+          <div className="text-sm text-green-400 flex items-center justify-center space-x-2">
+            <div className="loader-dots flex space-x-1">
+              <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></span>
+              <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-200"></span>
+              <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-400"></span>
+            </div>
           </div>
         )}
       </div>

@@ -7,6 +7,7 @@ import {
 } from "firebase/auth";
 import { auth, provider } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
+import { ToastNotification, showToast } from "../components/ToastNotification";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +19,8 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      alert("Login successful");
+
+      showToast("Login success", "success");
       navigate("/");
     } catch (error: any) {
       alert(error.message);
@@ -29,6 +31,7 @@ const Login: React.FC = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
         if (result) {
+          showToast("Login success", "success");
           navigate("/");
         }
       })
@@ -40,7 +43,7 @@ const Login: React.FC = () => {
   const handlePasswordReset = async () => {
     try {
       await sendPasswordResetEmail(auth, email);
-      alert("Password reset email sent!");
+      showToast("Password reset email sent!", "success");
     } catch (error: any) {
       alert(error.message);
     }
@@ -124,6 +127,7 @@ const Login: React.FC = () => {
           </button>
         </div>
       </div>
+      <ToastNotification />
     </div>
   );
 };

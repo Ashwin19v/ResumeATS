@@ -4,6 +4,7 @@ import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../config/firebase";
 import axios from "axios";
+import { showToast } from "../components/ToastNotification";
 
 interface Message {
   text: string;
@@ -18,9 +19,11 @@ interface AppContextProps {
   user: User | null;
   loading: boolean;
   messages: Message[];
+
   isBotTyping: boolean;
   isModalOpen: boolean;
   progress: number;
+  uploading: boolean;
   jobDescription: string | null;
   selectedSection: { section: string; content: string }[] | null;
   resumeData: ResumeData | null;
@@ -94,6 +97,7 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [isBotTyping, setIsBotTyping] = useState<boolean>(false);
+  const [uploading, setUploading] = useState<boolean>(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -108,6 +112,7 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const handleUploadResume = async (file: File) => {
+    setUploading(true);
     try {
       const storageRef = ref(storage, `uploads/${user?.email}/${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, file);
@@ -115,8 +120,9 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          setProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          console.log("Upload is " + progress + "% done");
+          const progressValue =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setProgress(progressValue);
         },
         (error) => {
           console.error("Upload error:", error);
@@ -127,15 +133,18 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
             const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
             console.log("File available at", downloadUrl);
             setFileUrl(downloadUrl);
+            showToast("File uploaded successfully", "success");
           } catch (error) {
             console.error("Error getting download URL:", error);
-            throw error;
+            showToast("Error uploading file", "error");
           }
+          setUploading(false);
         }
       );
     } catch (error) {
       console.error("Upload failed:", error);
-      throw error;
+      showToast("Error uploading file", "error");
+      setLoading(false);
     }
   };
 
@@ -182,7 +191,7 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
       const botResponse = response.data.modified_content;
       let displayedText = "";
 
-      const botTypingMessage: Message = { text: "Typing...", sender: "bot" };
+      const botTypingMessage: Message = { text: "....", sender: "bot" };
       setMessages((prevMessages) => [...prevMessages, botTypingMessage]);
 
       for (let i = 0; i < botResponse.length; i++) {
@@ -203,20 +212,22 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
   };
   const logout = async () => {
     await signOut(auth);
-
+    showToast("Logout success", "success");
     setUser(null);
   };
 
   return (
     <AppContext.Provider
       value={{
+        progress,
+        uploading,
         isBotTyping,
         jobDescription,
         setJobDescription,
         messages,
         setMessages,
         handleChatPrompt,
-        progress,
+
         user,
         loading,
         logout,

@@ -5,6 +5,7 @@ import resume_builder from "../assets/images/resume_builder.jpeg";
 import vdo from "../assets/videos/vdo.mp4";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate, Link } from "react-router-dom";
+import { ToastNotification } from "../components/ToastNotification";
 const Home = () => {
   const [activeTab, setActiveTab] = useState("INSTANT RESUME REVIEW");
   const { user } = useAppContext();
@@ -71,8 +72,9 @@ const Home = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${activeTab === tab ? "border-white" : "border-transparent"
-                } hover:border-gray-300`}
+              className={`px-4 py-2 text-sm font-semibold transition-all border-b-2 ${
+                activeTab === tab ? "border-white" : "border-transparent"
+              } hover:border-gray-300`}
             >
               {tab}
             </button>
@@ -119,6 +121,7 @@ const Home = () => {
       </div>
 
       <Footer />
+      <ToastNotification />
     </div>
   );
 };

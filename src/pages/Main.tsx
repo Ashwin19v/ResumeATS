@@ -13,6 +13,10 @@ import {
 import { useAppContext } from "../context/AppContext";
 import ResumeReview from "./ResumeReview.tsx";
 import Navbar from "../components/MainPage/Navbar";
+import {
+  ToastNotification,
+  showToast,
+} from "../components/ToastNotification.tsx";
 
 const Main = () => {
   const {
@@ -34,7 +38,10 @@ const Main = () => {
 
   const handleResumeReview = () => {
     if (!pdfFile || !jobDescription || !fileUrl) {
-      alert("Please upload a resume and provide a job description");
+      showToast(
+        "Please upload a resume and provide a job description",
+        "warning"
+      );
       return;
     }
     handleProcessResume(jobDescription);
@@ -137,6 +144,7 @@ const Main = () => {
       {toggleNav && (
         <Navbar toggleNav={toggleNav} handleResumeReview={handleResumeReview} />
       )}
+      <ToastNotification />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { useAppContext } from "../../context/AppContext";
 interface PdfUploadProps {
   setPdfFile: React.Dispatch<React.SetStateAction<string | null>>;
 }
+import { showToast } from "../ToastNotification";
 
 const PdfUpload = ({ setPdfFile }: PdfUploadProps) => {
   const { handleUploadResume } = useAppContext();
@@ -15,7 +16,7 @@ const PdfUpload = ({ setPdfFile }: PdfUploadProps) => {
       setPdfFile(fileUrl);
       handleUploadResume(file);
     } else {
-      alert("Please upload a valid PDF file.");
+      showToast("Please upload a valid PDF file.", "error");
     }
   };
 
@@ -34,7 +35,7 @@ const PdfUpload = ({ setPdfFile }: PdfUploadProps) => {
       <input {...getInputProps()} />
 
       <div className="flex flex-col items-center">
-        <FaCloudUploadAlt className="text-blue-400 text-6xl mb-4 animate-bounce" />
+        <FaCloudUploadAlt className="text-blue-500 text-6xl mb-4 animate-bounce" />
 
         {isDragActive ? (
           <p className="text-blue-400 text-lg font-medium">

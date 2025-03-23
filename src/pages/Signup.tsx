@@ -4,6 +4,7 @@ import { auth, provider } from "../config/firebase";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
+import { showToast } from "../components/ToastNotification";
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Signup: React.FC = () => {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      alert("Sign Up successful");
+      showToast("Sign Up successful", "success");
       navigate("/login");
     } catch (error) {
       console.error(error);
@@ -25,6 +26,7 @@ const Signup: React.FC = () => {
   const handleGoogleSignup = async () => {
     await signInWithPopup(auth, provider)
       .then(() => {
+        showToast("Sign Up successful with Google", "success");
         navigate("/");
       })
       .catch((error) => {

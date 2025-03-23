@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "react-circular-progressbar/dist/styles.css";
 import gif from "../assets/gifs/gif.gif";
 import ResumeAnalysis from "../components/MainPage/ResumeAnalysis";
