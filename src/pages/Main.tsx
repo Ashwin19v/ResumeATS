@@ -17,12 +17,14 @@ import {
   ToastNotification,
   showToast,
 } from "../components/ToastNotification.tsx";
+import Resume from "./Resume.tsx";
 
 const Main = () => {
   const {
     user,
     isModalOpen,
     setIsModalOpen,
+    selectedSection,
     fileUrl,
     handleProcessResume,
     jobDescription,
@@ -37,7 +39,7 @@ const Main = () => {
   const handleToggleNav = () => setToggleNav(!toggleNav);
 
   const handleResumeReview = () => {
-    if (!pdfFile || !jobDescription || !fileUrl) {
+    if (!jobDescription || !fileUrl) {
       showToast(
         "Please upload a resume and provide a job description",
         "warning"
@@ -56,7 +58,7 @@ const Main = () => {
     <div className="flex w-full  bg-gray-900 text-white flex-wrap ">
       <Chatbot toggle={isModalOpen} handleToggle={handleOpenModal} />
 
-      <div className="p-5  h-screen flex flex-col   w-full sm:w-[50%] border-r-2 border- border-gray-600">
+      <div className="p-5  h-screen flex flex-col justify-between  w-full sm:w-[50%] border-r-2 border- border-gray-600">
         <div className="mb-6 space-y-4">
           <div className="flex items-center sm:gap-4 gap-1">
             <img
@@ -99,9 +101,7 @@ const Main = () => {
           </div>
         </div>
         <div>
-          <h2 className="text-lg font-bold" onClick={handleToggleNav}>
-            Upload & Preview PDF
-          </h2>
+          <h2 className="text-lg font-bold">Upload & Preview PDF</h2>
         </div>
 
         <PdfUpload setPdfFile={setPdfFile} />
@@ -123,14 +123,16 @@ const Main = () => {
           </select>
 
           <div className="flex justify-between items-center mt-10">
-            <FontAwesomeIcon
-              icon={faMessage}
-              bounce={true}
-              onClick={handleOpenModal}
-              className="bg-blue-600 hover:bg-blue-700 transition-colors p-3 rounded-full h-5 cursor-pointer"
-            />
+            {selectedSection && (
+              <FontAwesomeIcon
+                icon={faMessage}
+                bounce={true}
+                onClick={handleOpenModal}
+                className="bg-blue-600 hover:bg-blue-700 transition-colors p-3 rounded-full h-5 cursor-pointer"
+              />
+            )}
             <button
-              className="w-1/5 bg-blue-600 rounded-lg h-10 hover:bg-blue-700 transition-colors"
+              className="w-1/5 bg-blue-600 rounded-lg h-10 hover:bg-blue-700 transition-colors ml-auto"
               onClick={handleResumeReview}
             >
               Send
@@ -144,6 +146,7 @@ const Main = () => {
       {toggleNav && (
         <Navbar toggleNav={toggleNav} handleResumeReview={handleResumeReview} />
       )}
+      <Resume />
       <ToastNotification />
     </div>
   );

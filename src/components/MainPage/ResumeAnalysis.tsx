@@ -2,25 +2,13 @@ import AtScoreModal from "./AtsScore";
 import { useAppContext } from "../../context/AppContext";
 
 const ResumeAnalysis = () => {
-  const { resumeData } = useAppContext();
+  const { resumeData, handlePreview } = useAppContext();
 
   if (!resumeData) {
     return <div>Loading...</div>;
   }
 
   const similarityScore = resumeData.ats_score?.ats_score?.toFixed(2) || "0.00";
-  const previewPage = () => {
-    window.open("/resume");
-  };
-
-  const printPage = () => {
-    const newWindow = window.open("/resume");
-    if (newWindow) {
-      newWindow.onload = () => {
-        newWindow.print();
-      };
-    }
-  };
 
   return (
     <div className="flex gap-6">
@@ -43,6 +31,16 @@ const ResumeAnalysis = () => {
             </div>
             <div className="w-[100px] h-[100px] my-auto sm:w-[200px] sm:h-[200px] flex justify-center items-center">
               <AtScoreModal atsScore={similarityScore} />
+            </div>
+          </div>
+
+          {/* summary */}
+          <div className="mt-6">
+            <h3 className="text-lg font-bold">Summary</h3>
+            <div className="p-4 border border-gray-700 rounded-lg">
+              <p className="text-white">
+                {resumeData.structured_data?.summary_or_objective}
+              </p>
             </div>
           </div>
 
@@ -83,26 +81,27 @@ const ResumeAnalysis = () => {
           {/* Education Section */}
           <div className="mt-6">
             <h3 className="text-lg font-bold">Education</h3>
-            {resumeData.structured_data?.education?.map((edu, index) => (
-              <div
-                key={index}
-                className="mb-4 p-4 border border-gray-700 rounded-lg"
-              >
-                <h4 className="text-md font-semibold">{edu.institution}</h4>
-                <p className="text-gray-400">
-                  {edu.degree} (CGPA: {edu.gpa})
-                </p>
-                <p className="text-gray-400">
-                  {edu.start_date} - {edu.end_date}
-                </p>
-              </div>
-            ))}
+            {resumeData?.structured_data.education &&
+              resumeData?.structured_data?.education?.map((edu, index) => (
+                <div
+                  key={index}
+                  className="mb-4 p-4 border border-gray-700 rounded-lg"
+                >
+                  <h4 className="text-md font-semibold">{edu.institution}</h4>
+                  <p className="text-gray-400">
+                    {edu.degree} (CGPA: {edu.gpa})
+                  </p>
+                  <p className="text-gray-400">
+                    {edu.start_date} - {edu.end_date}
+                  </p>
+                </div>
+              ))}
           </div>
 
           {/* Certifications */}
           <div className="mt-6">
             <h3 className="text-lg font-bold">Certifications</h3>
-            <ul className="list-disc pl-5">
+            <ul className="list-disc p-4 pl-6 border border-gray-700 ">
               {resumeData.structured_data?.certifications?.map(
                 (cert, index) => (
                   <li key={index}>{cert}</li>
@@ -111,27 +110,41 @@ const ResumeAnalysis = () => {
             </ul>
           </div>
 
-          {/* Areas of Interest */}
+          {/* projects */}
           <div className="mt-6">
-            <h3 className="text-lg font-bold">Areas of Interest</h3>
-            <ul className="list-disc pl-5">
-              {resumeData.structured_data?.areas_of_interest?.map(
-                (interest: string, index: number) => (
-                  <li key={index}>{interest}</li>
-                )
-              )}
+            <h3 className="text-lg font-bold">Projects</h3>
+            <ul className="list-disc p-4 pl-6 border border-gray-700">
+              {resumeData.structured_data?.projects?.map((project, index) => (
+                <li key={index}>
+                  <strong>{project?.name}</strong>
+                  <li className="list-none">
+                    {project?.description ? project.description : project}
+                  </li>
+                </li>
+              ))}
             </ul>
           </div>
+
+          {/* Areas of Interest */}
+          {resumeData.structured_data.areas_of_interest && (
+            <div className="mt-6">
+              <h3 className="text-lg font-bold">Areas of Interest</h3>
+              <ul className="list-disc pl-5">
+                {resumeData.structured_data?.areas_of_interest?.map(
+                  (interest: string, index: number) => (
+                    <li key={index}>{interest}</li>
+                  )
+                )}
+              </ul>
+            </div>
+          )}
           <div className="flex justify-start gap-10 items-center w-full my-4">
-            <button
-              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
-              onClick={printPage}
-            >
+            <button className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
               Download as PDF
             </button>
             <button
               className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
-              onClick={previewPage}
+              onClick={handlePreview}
             >
               Preview
             </button>

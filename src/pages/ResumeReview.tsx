@@ -11,6 +11,7 @@ const ResumeReview = ({
   setResumeReview: (value: boolean) => void;
 }) => {
   const [currentPage, setCurrentPage] = useState<string>("Resume Analysis");
+
   const { loading } = useAppContext();
 
   if (loading) {

@@ -1,142 +1,233 @@
+import React, { useRef, useState } from "react";
+import { FaPhone, FaEnvelope, FaLinkedin, FaGithub } from "react-icons/fa";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { useAppContext } from "../context/AppContext";
 
 const Resume = () => {
-  const { user, resumeData } = useAppContext();
-  console.log(user, resumeData);
+  const pdfRef = useRef<HTMLDivElement>(null);
+  const { preview, handlePreview, resumeData } = useAppContext();
 
-  if (user === null || resumeData === null) {
-    return (
-      <div className="h-screen flex flex-col justify-center items-center w-full sm:w-[50%] bg-gray-900">
-        <h1 className="text-white text-2xl font-bold animate-pulse">
-          Loading...
-        </h1>
-        <p className="text-gray-400">Estimated Time: 10s</p>
-      </div>
-    );
-  }
+  const downloadPDF = () => {
+    if (pdfRef.current) {
+      html2canvas(pdfRef.current, {
+        scale: 2,
+        useCORS: true,
+      }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/png", 1.0);
+        const pdf = new jsPDF("p", "mm", "a4");
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        console.log(imgHeight, imgWidth);
 
-  const { structured_data } = resumeData;
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        pdf.save("resume.pdf");
+      });
+    }
+  };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white text-sm">
-      <header className="text-center mb-4">
-        <h1 className="text-2xl font-bold text-gray-900">
-          {structured_data?.name}
-        </h1>
-        <p className="text-gray-700">
-          {structured_data?.phone}, {structured_data?.location}
-        </p>
-        <p className="text-blue-500">
-          <a
-            href={`mailto:${structured_data?.email}`}
-            className="hover:underline"
-          >
-            Email
-          </a>{" "}
-          |
-          <a href={structured_data?.linkedin} className="hover:underline">
-            {" "}
-            LinkedIn
-          </a>{" "}
-          |
-          <a href={structured_data?.github} className="hover:underline">
-            {" "}
-            GitHub
-          </a>
-        </p>
-      </header>
+    <div className="relative">
+      {preview && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          onClick={handlePreview}
+        >
+          <div className="bg-white w-full sm:w-[50%]  p-6 rounded-lg shadow-lg relative h-full overflow-auto flex flex-col justify-between font-times">
+            {/* Resume Content */}
+            <div ref={pdfRef} id="resume-content" className="p-6">
+              {/* Header */}
+              <header className="text-center mb-4">
+                <h1 className="text-xl font-bold text-black">
+                  {resumeData?.structured_data?.name}
+                </h1>
+                <div className="flex justify-center items-center gap-6 text-black mt-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <FaPhone />
+                    <span>{resumeData?.structured_data?.phone} </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <FaEnvelope />
+                    <a
+                      href="mailto:harishkb20205@gmail.com"
+                      className="hover:underline text-blue-500"
+                    >
+                      {resumeData?.structured_data?.email}
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <FaLinkedin />
+                    <a
+                      href="https://linkedin.com/in/harishkb"
+                      className="hover:underline text-blue-500"
+                    >
+                      Harish KB
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <FaGithub />
+                    <a
+                      href="https://github.com/HARISH20205"
+                      className="hover:underline text-blue-500"
+                    >
+                      HARISH20205
+                    </a>
+                  </div>
+                </div>
+              </header>
 
-      <section className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold text-gray-800">OBJECTIVE</h2>
-        <p className="text-gray-700">{structured_data?.objective}</p>
-      </section>
+              {/* Objective Section */}
+              {resumeData?.structured_data?.summary_or_objective && (
+                <section className="mb-4">
+                  <h2 className="text-md font-semibold text-black">
+                    OBJECTIVE
+                  </h2>
+                  <div className="border-b-2 border-black mt-2"></div>
+                  <p className="text-xs text-black">
+                    To secure a challenging position in a reputable organization
+                    to expand my learnings, knowledge, and skills.
+                  </p>
+                </section>
+              )}
 
-      <section className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold text-gray-800">EDUCATION</h2>
-        {structured_data?.education?.map((edu, index) => (
-          <p key={index} className="text-gray-700">
-            <strong>{edu.degree}</strong>, {edu.institution} ({edu.start_date} -{" "}
-            {edu.end_date})
-          </p>
-        ))}
-      </section>
+              {/* Education Section */}
+              {resumeData?.structured_data?.education && (
+                <section className="pb-2">
+                  <h2 className="text-md font-semibold text-black">
+                    EDUCATION
+                  </h2>
+                  <div className="border-b-2 border-black mt-2"></div>
+                  {resumeData.structured_data?.education?.map((edu, index) => (
+                    <div key={index} className="mb-4 text-black">
+                      <h4 className="text-sm font-semibold">
+                        {edu.institution}
+                      </h4>
+                      <p className="text-xs text-black">
+                        {edu.degree} (CGPA: {edu.gpa})
+                      </p>
+                      <p className="text-xs text-black">
+                        {edu.start_date} - {edu.end_date}
+                      </p>
+                    </div>
+                  ))}
+                </section>
+              )}
 
-      <section className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold text-gray-800">SKILLS</h2>
-        <div className="text-gray-700">
-          <div>
-            <p>
-              <strong>Frontend:</strong>{" "}
-              {structured_data?.skills?.frontend?.join(", ")}
-            </p>
-            <p>
-              <strong>Backend:</strong>{" "}
-              {structured_data?.skills?.backend?.join(", ")}
-            </p>
-          </div>
-          <div>
-            <p>
-              <strong>Databases:</strong>{" "}
-              {structured_data?.skills?.databases?.join(", ")}
-            </p>
-            <p>
-              <strong>Tools:</strong>{" "}
-              {structured_data?.skills?.tools?.join(", ")}
-            </p>
+              {/* Skills Section */}
+              <section className="mb-4 pb-2 text-xs">
+                <h2 className="text-md font-semibold text-black">SKILLS</h2>
+                <div className="border-b-2 border-black mt-2"></div>
+                <div className="text-black">
+                  <p>
+                    <strong>Frontend:</strong> React, Angular, HTML, CSS,
+                    JavaScript
+                  </p>
+                  <p>
+                    <strong>Backend:</strong> Node.js, Express, Python
+                  </p>
+                  <p>
+                    <strong>Databases:</strong> MySQL, MongoDB
+                  </p>
+                  <p>
+                    <strong>Tools:</strong> Git, Docker, Jenkins
+                  </p>
+                </div>
+              </section>
+
+              {/* Experience Section */}
+              {resumeData?.structured_data?.experience && (
+                <section className="mb-4 pb-2 text-xs">
+                  <h2 className="text-md font-semibold text-black">
+                    EXPERIENCE
+                  </h2>
+                  <div className="border-b-2 border-black mt-2"></div>
+                  {resumeData.structured_data?.experience?.map((exp, index) => (
+                    <div key={index} className="mt-2 text-black">
+                      <h4 className="text-sm font-semibold">
+                        {exp.title} - {exp.company}
+                      </h4>
+                      <p className="text-xs">
+                        {exp.start_date} - {exp.end_date}
+                      </p>
+                      <p className="">{exp.description}</p>
+                    </div>
+                  ))}
+                </section>
+              )}
+
+              {/* Projects Section */}
+              {resumeData?.structured_data?.projects && (
+                <section className="mb-4 pb-2 text-xs">
+                  <h2 className="text-md font-semibold text-black">PROJECTS</h2>
+                  <div className="border-b-2 border-black mt-2"></div>
+                  <ul className="list-disc text-black pl-6">
+                    {resumeData.structured_data?.projects?.map(
+                      (project, index) => (
+                        <li key={index}>
+                          <strong className="text-sm">{project?.name}</strong>
+                          <p className="text-xs">
+                            {project?.description
+                              ? project.description
+                              : project}
+                          </p>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </section>
+              )}
+
+              {/* Certifications Section */}
+              {resumeData?.structured_data?.certifications && (
+                <section className="mb-4 pb-2 text-xs">
+                  <h2 className="text-md font-semibold text-black">
+                    CERTIFICATIONS
+                  </h2>
+                  <div className="border-b-2 border-black mt-2"></div>
+                  <ul className="list-disc text-black pl-6">
+                    {resumeData?.structured_data?.certifications?.map(
+                      (cert, index) => (
+                        <li key={index} className="text-xs">
+                          {cert}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </section>
+              )}
+
+              {/* Area of interest*/}
+              {resumeData?.structured_data?.areas_of_interest && (
+                <section className="mb-4 pb-2 text-xs">
+                  <h2 className="text-md font-semibold text-black">
+                    AREA OF INTEREST
+                  </h2>
+                  <div className="border-b-2 border-black mt-2"></div>
+                  <ul className="list-disc text-black pl-6">
+                    {resumeData?.structured_data?.areas_of_interest?.map(
+                      (interest, index) => (
+                        <li key={index} className="text-xs">
+                          {interest}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </section>
+              )}
+            </div>
+
+            {/* PDF Download Button */}
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={downloadPDF}
+                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+              >
+                Download as PDF
+              </button>
+            </div>
           </div>
         </div>
-      </section>
-
-      <section className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold text-gray-800">EXPERIENCE</h2>
-        {structured_data?.experience?.map((exp, index) => (
-          <div key={index}>
-            <h3 className="text-md font-semibold text-gray-900">{exp.title}</h3>
-            <p className="text-gray-600">
-              {exp.company} ({exp.start_date} - {exp.end_date})
-            </p>
-            <ul className="list-disc pl-5 text-gray-700">
-              {exp.responsibilities?.map((responsibility, idx) => (
-                <li key={idx}>{responsibility}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
-
-      <section className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold text-gray-800">PROJECTS</h2>
-        {structured_data?.projects?.map((project, index) => (
-          <p key={index} className="text-gray-700">
-            {project.name} - {project.description}
-          </p>
-        ))}
-      </section>
-
-      <section className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold text-gray-800">CERTIFICATIONS</h2>
-        <ul className="list-disc pl-5 text-gray-700">
-          {structured_data?.certifications?.map((cert, index) => (
-            <li key={index}>{cert}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold text-gray-800">
-          EXTRA-CURRICULAR
-        </h2>
-        <ul className="list-disc pl-5 text-gray-700">
-          {structured_data?.extra_curricular?.map((activity, index) => (
-            <li key={index}>{activity}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">LEADERSHIP</h2>
-        <p className="text-gray-700">{structured_data?.leadership}</p>
-      </section>
+      )}
     </div>
   );
 };

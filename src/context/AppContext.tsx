@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { auth } from "../config/firebase";
+import { auth, db, storage } from "../config/firebase";
 import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "../config/firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import axios from "axios";
 import { showToast } from "../components/ToastNotification";
 
@@ -19,7 +19,7 @@ interface AppContextProps {
   user: User | null;
   loading: boolean;
   messages: Message[];
-
+  preview: boolean;
   isBotTyping: boolean;
   isModalOpen: boolean;
   progress: number;
@@ -28,6 +28,7 @@ interface AppContextProps {
   selectedSection: { section: string; content: string }[] | null;
   resumeData: ResumeData | null;
   logout: () => Promise<void>;
+  handlePreview: () => void;
   handleUploadResume: (file: File) => Promise<void>;
   setSelectedSection: React.Dispatch<
     React.SetStateAction<{ section: string; content: string }[] | null>
@@ -56,16 +57,26 @@ interface Education {
   end_date: string;
 }
 
+interface Project {
+  project: string;
+  name: string;
+  description: string;
+  link: string;
+}
+
 interface ResumeData {
   user_id: string;
   ats_score: {
     ats_score: number;
   };
+
   structured_data: {
     name: string;
     email: string;
     phone: string;
     skills: string[];
+    summary_or_objective: string;
+    projects: Project[];
     experience: Experience[];
     education: Education[];
     certifications: string[];
@@ -98,6 +109,11 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [isBotTyping, setIsBotTyping] = useState<boolean>(false);
   const [uploading, setUploading] = useState<boolean>(false);
+  const [preview, setPreview] = useState<boolean>(false);
+
+  const handlePreview = () => {
+    setPreview(!preview);
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -151,6 +167,7 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
   const handleProcessResume = async (jobDescription: string) => {
     try {
       setLoading(true);
+
       const response = await axios.post(
         `${baseUrl}/process_resume/`,
         {
@@ -164,13 +181,44 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
           },
         }
       );
-      console.log(response.data);
-      setResumeData(response.data);
+
+      console.log("Response:", response.data);
+
+      const resumeRef = doc(db, "resumes", user?.uid!);
+      await setDoc(resumeRef, {
+        user_id: user?.uid,
+        file_link: fileUrl,
+        job_description: jobDescription,
+        processed_data: response.data,
+        timestamp: new Date(),
+      });
+      fetchProcessedResume();
       setLoading(false);
     } catch (error) {
       setLoading(false);
       console.error("Error processing resume:", error);
       throw error;
+    }
+  };
+
+  const fetchProcessedResume = async () => {
+    try {
+      setLoading(true);
+
+      const resumeRef = doc(db, "resumes", user?.uid!);
+      const resumeSnap = await getDoc(resumeRef);
+
+      if (resumeSnap.exists()) {
+        console.log("Fetched Resume Data:", resumeSnap.data());
+        setResumeData(resumeSnap.data()?.processed_data);
+      } else {
+        showToast("No processed resume found", "error");
+      }
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching resume:", error);
     }
   };
 
@@ -189,6 +237,8 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
 
       setIsBotTyping(true);
       const botResponse = response.data.modified_content;
+      console.log(response.data);
+
       let displayedText = "";
 
       const botTypingMessage: Message = { text: "....", sender: "bot" };
@@ -219,6 +269,8 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppContext.Provider
       value={{
+        handlePreview,
+        preview,
         progress,
         uploading,
         isBotTyping,

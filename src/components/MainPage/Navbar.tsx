@@ -74,12 +74,12 @@ const Navbar = ({
             className="text-gray-400 hover:text-blue-400 transform hover:scale-110 
                 transition-all duration-300 cursor-pointer"
           />
-          <FontAwesomeIcon
+          {/* <FontAwesomeIcon
             icon={faLightbulb}
             size="2x"
             className="text-gray-400 hover:text-blue-400 transform hover:scale-110 
                 transition-all duration-300 cursor-pointer hover:rotate-12"
-          />
+          /> */}
         </div>
       </div>
       <div className="mt-auto mb-4 cursor-pointer group" onClick={handleLogout}>
