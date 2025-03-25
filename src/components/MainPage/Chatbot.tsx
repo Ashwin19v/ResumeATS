@@ -15,7 +15,7 @@ const Chatbot = ({
     const [input, setInput] = useState("");
     const {
         handleChatPrompt,
-        handelUpdateResume,
+        handleUpdateResume,
         messages,
         selectedSection,
         isBotTyping,
@@ -53,10 +53,11 @@ const Chatbot = ({
         console.log("Updating section:", sectionPath);
         console.log("With text:", msg.text);
 
-        handelUpdateResume({
+        handleUpdateResume({
             section: sectionPath,
             text: msg.text,
             index: msg.index,
+            descIndex: 0,
         });
     };
 

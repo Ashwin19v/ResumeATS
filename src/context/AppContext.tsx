@@ -39,14 +39,16 @@ interface AppContextProps {
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
     handleProcessResume: (jobDescription: string) => Promise<void>;
     handleChatPrompt: (jobDescription: string, prompt: string) => Promise<void>;
-    handelUpdateResume: ({
+    handleUpdateResume: ({
         section,
         text,
         index,
+        descIndex,
     }: {
         section: string;
         text: string;
         index: number;
+        descIndex: number;
     }) => Promise<void>;
     setResumeData: React.Dispatch<React.SetStateAction<ResumeData | null>>;
     fileUrl: string | null;
@@ -284,52 +286,63 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
         text: string;
     }
 
-    const handelUpdateResume = async ({
+    const handleUpdateResume = async ({
         section,
         text,
         index,
+        descIndex,
     }: {
         section: string;
         text: string;
         index: number;
+        descIndex: number;
     }): Promise<void> => {
         try {
             setLoading(true);
             console.log(
-                `Updating section: ${section} at index: ${index} with text: ${text}`
+                `Updating ${section} at index: ${index}, description ${descIndex} with text: ${text}`
             );
 
-            // Use existing resumeData instead of fetching again
+            // Use existing resumeData to avoid extra fetching
             let experienceArray = [
                 ...(resumeData?.structured_data?.[section] || []),
             ];
 
-            // 🛠 Ensure the index exists in the array
+            // 🛠 Ensure the index exists
             if (!experienceArray[index]) {
-                showToast("Invalid index for experience section", "error");
+                showToast("Invalid experience index", "error");
                 return;
             }
 
-            console.log("Experience Array before update:", experienceArray);
-
             // 🛠 Ensure description is an array
             if (!Array.isArray(experienceArray[index].description)) {
-                experienceArray[index].description = [];
+                showToast("Invalid description format", "error");
+                return;
+            }
+            console.log(experienceArray[index].description);
+
+            // 🛠 Ensure the description index exists
+            if (!experienceArray[index].description[descIndex]) {
+                showToast("Invalid description index", "error");
+                return;
             }
 
-            // ✅ Push the new text into description array
-            experienceArray[index].description.push(text);
+            // ✅ Update the specific description
+            experienceArray[index].description[descIndex] = text;
 
-            // ✅ Firestore Update (Target Specific Path)
+            // ✅ Firestore Update (Targeting Specific Description)
             const resumeRef = doc(db, "resumes", user?.uid!);
             await updateDoc(resumeRef, {
                 [`processed_data.structured_data.${section}.${index}.description`]:
                     experienceArray[index].description,
             });
 
-            console.log("Update successful:", experienceArray[index]);
+            console.log(
+                "Update successful:",
+                experienceArray[index].description
+            );
 
-            // ✅ Fetch the latest content after update
+            // ✅ Fetch updated content
             fetchProcessedResume();
         } catch (error) {
             console.error("Error updating resume:", error);
@@ -339,7 +352,6 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const updateSkills = () => {};
     const logout = async () => {
         await signOut(auth);
         showToast("Logout success", "success");
@@ -359,7 +371,7 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
                 messages,
                 setMessages,
                 handleChatPrompt,
-                handelUpdateResume,
+                handleUpdateResume,
 
                 user,
                 loading,
