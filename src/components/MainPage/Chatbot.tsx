@@ -39,6 +39,7 @@ const Chatbot = ({
         }
 
         const sectionInfo = selectedSection[0];
+        console.log("Selected Section:", sectionInfo);
 
         if (!sectionInfo || !sectionInfo.section) {
             showToast("Invalid section data", "error");
@@ -46,7 +47,6 @@ const Chatbot = ({
         }
 
         const sectionName = sectionInfo.section;
-        const content = sectionInfo.content;
 
         const sectionPath = `processed_data.structured_data.${sectionName}`;
 
@@ -56,6 +56,7 @@ const Chatbot = ({
         handelUpdateResume({
             section: sectionPath,
             text: msg.text,
+            index: msg.index,
         });
     };
 
@@ -106,7 +107,7 @@ const Chatbot = ({
                                         onClick={() => {
                                             if (
                                                 !selectedSection ||
-                                                !selectedSection[index]
+                                                !selectedSection[0]
                                             ) {
                                                 showToast(
                                                     "No section selected or invalid section",

@@ -102,12 +102,12 @@ const ResumeReview = () => {
                         </div>
                         <div className="bg-yellow-900 p-6 rounded-lg shadow-md">
                             <h3 className="text-lg font-medium text-yellow-200">
-                                Overall Formatting
+                                Project Match
                             </h3>
                             <p className="text-2xl font-bold text-yellow-400">
                                 {
                                     data.ats_score?.detailed_scores
-                                        .overall_formatting
+                                        .project_relevance
                                 }
                                 %
                             </p>

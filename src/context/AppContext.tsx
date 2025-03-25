@@ -31,7 +31,9 @@ interface AppContextProps {
     handlePreview: () => void;
     handleUploadResume: (file: File) => Promise<void>;
     setSelectedSection: React.Dispatch<
-        React.SetStateAction<{ section: string; content: string }[] | null>
+        React.SetStateAction<
+            { section: string; content: string; index: number }[] | null
+        >
     >;
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
@@ -40,9 +42,11 @@ interface AppContextProps {
     handelUpdateResume: ({
         section,
         text,
+        index,
     }: {
         section: string;
         text: string;
+        index: number;
     }) => Promise<void>;
     setResumeData: React.Dispatch<React.SetStateAction<ResumeData | null>>;
     fileUrl: string | null;
@@ -283,37 +287,58 @@ function AppContextProvider({ children }: { children: React.ReactNode }) {
     const handelUpdateResume = async ({
         section,
         text,
-    }: UpdateResumeParams): Promise<void> => {
+        index,
+    }: {
+        section: string;
+        text: string;
+        index: number;
+    }): Promise<void> => {
         try {
             setLoading(true);
-            console.log(`Updating section: ${section} with text: ${text}`);
+            console.log(
+                `Updating section: ${section} at index: ${index} with text: ${text}`
+            );
 
-            const resumeRef = doc(db, "resumes", user?.uid!);
+            // Use existing resumeData instead of fetching again
+            let experienceArray = [
+                ...(resumeData?.structured_data?.[section] || []),
+            ];
 
-            // Create a properly nested update object
-            const updateData = {};
-            updateData[section] = text;
-
-            await updateDoc(resumeRef, updateData);
-            console.log("Update successful");
-
-            // Refresh the resume data after update
-            const resumeSnap = await getDoc(resumeRef);
-            if (resumeSnap.exists()) {
-                console.log("Fetched updated resume data:", resumeSnap.data());
-                setResumeData(resumeSnap.data()?.processed_data);
-                showToast("Resume section updated successfully", "success");
-            } else {
-                showToast("No processed resume found", "error");
+            // 🛠 Ensure the index exists in the array
+            if (!experienceArray[index]) {
+                showToast("Invalid index for experience section", "error");
+                return;
             }
 
-            setLoading(false);
+            console.log("Experience Array before update:", experienceArray);
+
+            // 🛠 Ensure description is an array
+            if (!Array.isArray(experienceArray[index].description)) {
+                experienceArray[index].description = [];
+            }
+
+            // ✅ Push the new text into description array
+            experienceArray[index].description.push(text);
+
+            // ✅ Firestore Update (Target Specific Path)
+            const resumeRef = doc(db, "resumes", user?.uid!);
+            await updateDoc(resumeRef, {
+                [`processed_data.structured_data.${section}.${index}.description`]:
+                    experienceArray[index].description,
+            });
+
+            console.log("Update successful:", experienceArray[index]);
+
+            // ✅ Fetch the latest content after update
+            fetchProcessedResume();
         } catch (error) {
-            setLoading(false);
             console.error("Error updating resume:", error);
             showToast(`Update failed: ${error.message}`, "error");
+        } finally {
+            setLoading(false);
         }
     };
+
     const updateSkills = () => {};
     const logout = async () => {
         await signOut(auth);

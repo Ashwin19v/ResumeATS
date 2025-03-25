@@ -14,10 +14,16 @@ const ResumeAnalysis = () => {
 
     const data = resumeData;
 
-    const handleSectionClick = (section: FeedbackKey, content: string) => {
+    const handleSectionClick = (
+        section: FeedbackKey,
+        content: string,
+        index: number
+    ) => {
         console.log(section, content);
 
-        setSelectedSection([{ section: section, content: content }]);
+        setSelectedSection([
+            { section: section, content: content, index: index },
+        ]);
 
         setIsModalOpen(true);
     };
@@ -61,18 +67,19 @@ const ResumeAnalysis = () => {
                     </div>
 
                     {/* summary */}
-                    <div className="mt-6">
-                        <h3 className="text-lg font-bold">Summary</h3>
-                        <div className="p-4 border border-gray-700 rounded-lg">
-                            <p className="text-white">
-                                {
-                                    resumeData.structured_data
-                                        ?.summary_or_objective
-                                }
-                            </p>
+                    {resumeData.structured_data?.summary && (
+                        <div className="mt-6">
+                            <h3 className="text-lg font-bold">Summary</h3>
+                            <div className="p-4 border border-gray-700 rounded-lg">
+                                <p className="text-white">
+                                    {
+                                        resumeData.structured_data
+                                            ?.summary_or_objective
+                                    }
+                                </p>
+                            </div>
                         </div>
-                    </div>
-
+                    )}
                     {/* Skills Section */}
                     <div className="mt-6">
                         <h3 className="text-lg font-bold">Skills</h3>
@@ -87,15 +94,6 @@ const ResumeAnalysis = () => {
                                 )
                             )}
                         </ul>
-                        <button
-                            onClick={() => {
-                                handleAddSkills(
-                                    resumeData.structured_data?.skills || []
-                                );
-                            }}
-                            className="bg-blue-500 text-white px-2 py-1 rounded-lg cursor-pointer">
-                            Add skills
-                        </button>
                     </div>
 
                     {/* Experience Section */}
@@ -104,32 +102,49 @@ const ResumeAnalysis = () => {
                             <h3 className="text-lg font-bold">Experience</h3>
                         </div>
 
-                        {resumeData.structured_data?.experience?.map(
-                            (exp, index) => (
-                                <div
-                                    key={index}
-                                    className="mb-4 p-4 border border-gray-700 rounded-lg">
-                                    <h4 className="text-md font-semibold">
-                                        {exp.title} - {exp.company}
-                                    </h4>
-                                    <p className="text-gray-400">
-                                        {exp.start_date} - {exp.end_date}
-                                    </p>
-                                    <p className="mt-2">{exp.description}</p>
-                                    <button
-                                        className=" bg-blue-500 text-white px-2 py-1 rounded-lg 
-                                       cursor-pointer"
-                                        onClick={() =>
-                                            handleSectionClick(
-                                                "experience",
-                                                exp.description
-                                            )
-                                        }>
-                                        Ask our bot
-                                    </button>
-                                </div>
-                            )
-                        )}
+                        {Array.isArray(
+                            resumeData?.structured_data?.experience
+                        ) &&
+                            resumeData.structured_data.experience.length > 0 &&
+                            resumeData.structured_data.experience.map(
+                                (exp, index) => (
+                                    <div
+                                        key={index}
+                                        className="mb-4 p-4 border border-gray-700 rounded-lg">
+                                        <h4 className="text-md font-semibold">
+                                            {exp.title} - {exp.company}
+                                        </h4>
+                                        <p className="text-gray-400">
+                                            {exp.start_date} - {exp.end_date}
+                                        </p>
+
+                                        {/* Ensure description is an array before mapping */}
+                                        {Array.isArray(exp.description) &&
+                                            exp.description.length > 0 && (
+                                                <ul className="list-disc pl-5 mt-2">
+                                                    {exp.description.map(
+                                                        (desc, i) => (
+                                                            <li key={i}>
+                                                                {desc}
+                                                                <button
+                                                                    className="bg-blue-500 text-white px-2 py-1 rounded-lg cursor-pointer ml-2"
+                                                                    onClick={() =>
+                                                                        handleSectionClick(
+                                                                            "experience",
+                                                                            desc,
+                                                                            index
+                                                                        )
+                                                                    }>
+                                                                    Ask Bot
+                                                                </button>
+                                                            </li>
+                                                        )
+                                                    )}
+                                                </ul>
+                                            )}
+                                    </div>
+                                )
+                            )}
                     </div>
 
                     {/* Education Section */}
@@ -168,34 +183,37 @@ const ResumeAnalysis = () => {
                     </div>
 
                     {/* projects */}
-                    <div className="mt-6">
-                        <h3 className="text-lg font-bold">Projects</h3>
-                        <ul className="list-disc p-4 pl-6 border border-gray-700">
-                            {resumeData.structured_data?.projects?.map(
-                                (project, index) => (
-                                    <li key={index}>
-                                        <strong>{project?.name}</strong>
-                                        <li className="list-none">
-                                            {typeof project === "string"
-                                                ? project
-                                                : project?.description}
-                                        </li>
-                                        <button
-                                            className=" bg-blue-500 text-white px-2 py-1 rounded-lg 
-                                       cursor-pointer"
-                                            onClick={() =>
-                                                handleSectionClick(
-                                                    "projects",
-                                                    project.description
-                                                )
-                                            }>
-                                            Ask our bot
-                                        </button>
-                                    </li>
-                                )
-                            )}
-                        </ul>
-                    </div>
+                    {Array.isArray(resumeData?.structured_data?.projects) &&
+                        resumeData.structured_data.projects.length > 0 && (
+                            <div className="mt-6">
+                                <h3 className="text-lg font-bold">Projects</h3>
+                                <ul className="list-disc p-4 pl-6 border border-gray-700">
+                                    {resumeData.structured_data.projects.map(
+                                        (project, index) => (
+                                            <li key={index}>
+                                                <strong>
+                                                    {project?.title}
+                                                </strong>
+                                                <li className="list-none">
+                                                    {project?.description}
+                                                </li>
+                                                <button
+                                                    className="bg-blue-500 text-white px-2 py-1 rounded-lg cursor-pointer"
+                                                    onClick={() =>
+                                                        handleSectionClick(
+                                                            "projects",
+                                                            project.description,
+                                                            index
+                                                        )
+                                                    }>
+                                                    Ask our bot
+                                                </button>
+                                            </li>
+                                        )
+                                    )}
+                                </ul>
+                            </div>
+                        )}
 
                     {/* Areas of Interest */}
                     {resumeData.structured_data.areas_of_interest && (
