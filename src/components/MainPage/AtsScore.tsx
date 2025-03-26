@@ -2,7 +2,7 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 interface AtScoreModalProps {
-  atsScore: string;
+  atsScore: number;
 }
 
 const AtScoreModal: React.FC<AtScoreModalProps> = ({ atsScore }) => {
