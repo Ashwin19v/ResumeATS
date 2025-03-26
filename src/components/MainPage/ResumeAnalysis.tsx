@@ -52,7 +52,7 @@ const ResumeAnalysis = () => {
               </div>
             </div>
             <div className="w-[100px] h-[100px] my-auto sm:w-[200px] sm:h-[200px] flex justify-center items-center">
-              <AtScoreModal atsScore={similarityScore} />
+              <AtScoreModal atsScore={parseFloat(similarityScore)} />
             </div>
           </div>
 

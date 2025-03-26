@@ -98,13 +98,19 @@ const Resume = () => {
                   </h2>
                   <div className="border-b-2 border-black mt-2"></div>
                   {resumeData.structured_data?.education?.map((edu, index) => (
-                    <div key={index} className="mb-4 text-black">
-                      <h4 className="text-sm font-semibold">
-                        {edu.institution}
-                      </h4>
-                      <p className="text-xs text-black">
-                        {edu.degree} (CGPA: {edu.gpa})
-                      </p>
+                    <div
+                      key={index}
+                      className="mb-4 text-black flex justify-between"
+                    >
+                      <div>
+                        <h4 className="text-sm font-semibold">
+                          {edu.institution}
+                        </h4>
+                        <p className="text-xs text-black">
+                          {edu.degree} (CGPA: {edu.gpa})
+                        </p>
+                      </div>
+
                       <p className="text-xs text-black">
                         {edu.start_date} - {edu.end_date}
                       </p>
@@ -117,20 +123,12 @@ const Resume = () => {
               <section className="mb-4 pb-2 text-xs">
                 <h2 className="text-md font-semibold text-black">SKILLS</h2>
                 <div className="border-b-2 border-black mt-2"></div>
-                <div className="text-black">
-                  <p>
-                    <strong>Frontend:</strong> React, Angular, HTML, CSS,
-                    JavaScript
-                  </p>
-                  <p>
-                    <strong>Backend:</strong> Node.js, Express, Python
-                  </p>
-                  <p>
-                    <strong>Databases:</strong> MySQL, MongoDB
-                  </p>
-                  <p>
-                    <strong>Tools:</strong> Git, Docker, Jenkins
-                  </p>
+                <div className="text-black flex   items-center flex-wrap">
+                  {resumeData?.structured_data?.skills?.map((skill, index) => (
+                    <li key={index} className="mx-1">
+                      {skill}
+                    </li>
+                  ))}
                 </div>
               </section>
 
@@ -141,17 +139,32 @@ const Resume = () => {
                     EXPERIENCE
                   </h2>
                   <div className="border-b-2 border-black mt-2"></div>
-                  {resumeData.structured_data?.experience?.map((exp, index) => (
-                    <div key={index} className="mt-2 text-black">
-                      <h4 className="text-sm font-semibold">
-                        {exp.title} - {exp.company}
-                      </h4>
-                      <p className="text-xs">
-                        {exp.start_date} - {exp.end_date}
-                      </p>
-                      <p className="">{exp.description}</p>
-                    </div>
-                  ))}
+                  {resumeData?.structured_data?.experience?.map(
+                    (exp, index) => (
+                      <div key={index} className="mt-2 text-black">
+                        <div className="flex justify-between">
+                          <h4 className="text-sm font-semibold">
+                            {exp.title} <hr></hr> {exp.company}
+                          </h4>
+                          <p className="text-xs">
+                            {exp.start_date} - {exp.end_date}
+                          </p>
+                        </div>
+
+                        <ul className="list-disc pl-6">
+                          {Array.isArray(exp.description) ? (
+                            exp.description.map((desc, idx) => (
+                              <li key={idx} className="text-xs">
+                                {desc}
+                              </li>
+                            ))
+                          ) : (
+                            <li className="text-xs">{exp.description}</li>
+                          )}
+                        </ul>
+                      </div>
+                    )
+                  )}
                 </section>
               )}
 
@@ -160,19 +173,18 @@ const Resume = () => {
                 <section className="mb-4 pb-2 text-xs">
                   <h2 className="text-md font-semibold text-black">PROJECTS</h2>
                   <div className="border-b-2 border-black mt-2"></div>
-                  <ul className="list-disc text-black pl-6">
-                    {resumeData.structured_data?.projects?.map(
-                      (project, index) => (
-                        <li key={index}>
-                          <strong className="text-sm">{project?.name}</strong>
-                          <p className="text-xs">
-                            {project?.description
-                              ? project.description
-                              : project}
-                          </p>
-                        </li>
-                      )
-                    )}
+                  <ul className="list-disc text-black pl-1">
+                    {resumeData.structured_data?.projects?.map((project) => (
+                      <div className="pl-5">
+                        <li className="mb-2 text-black ">{project.project}</li>
+                        <ul className="list-disc pl-5">
+                          {Array.isArray(project?.description) &&
+                            project.description.map((desc, i) => (
+                              <li key={i}>{desc}</li>
+                            ))}
+                        </ul>
+                      </div>
+                    ))}
                   </ul>
                 </section>
               )}

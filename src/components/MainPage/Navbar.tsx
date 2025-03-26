@@ -4,7 +4,6 @@ import {
   faFilePdf,
   faFileArchive,
   faUser,
-  faLightbulb,
   faSignOut,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
